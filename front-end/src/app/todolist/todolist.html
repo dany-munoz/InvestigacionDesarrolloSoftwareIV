@@ -1,0 +1,6 @@
+<h2>Tasks</h2>
+<ul class="task-list">
+    @for (t of tasks; track t.title){
+    <li [class.done]="t.done"> {{ t.title }} </li>
+    }
+</ul>

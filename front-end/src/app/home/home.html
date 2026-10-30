@@ -1,0 +1,10 @@
+<h1>TodoApp</h1>
+
+@if (authService.isLoggedIn()) {
+<p>Logged in.</p>
+<p><a routerLink="/tasks">View My Tasks</a></p>
+<button (click)="authService.logout()">Logout</button>
+} @else {
+<p>You haven't logged in yet.</p>
+<p><a routerLink="/login">Log in</a></p>
+}

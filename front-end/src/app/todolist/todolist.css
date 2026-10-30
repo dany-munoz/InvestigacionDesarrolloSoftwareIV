@@ -1,0 +1,18 @@
+.task-list {
+  list-style: none;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.task-list li {
+  padding: 0.6rem 0.9rem;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+}
+
+.task-list li.done {
+  text-decoration: line-through;
+  color: var(--ink-soft);
+}

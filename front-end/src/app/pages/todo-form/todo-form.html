@@ -1,0 +1,27 @@
+<h1>{{ editingId ? 'Edit Task' : 'Create Task' }}</h1>
+
+<form [formGroup]="form" (ngSubmit)="onSubmit()" class="todo-form">
+
+    <label for="title"> Title</label>
+    <input id="title" type="text" formControlName="title" autocomplete="title" />
+
+    @if (form.controls.title.invalid && form.controls.title.touched) {
+    <p class="field-error">Title is required</p>
+    }
+
+
+    <label for="description">Description</label>
+    <input id="description" type="text" formControlName="description" autocomplete="description" />
+
+    <!-- @if (form.controls.description.invalid && form.controls.description.touched) {
+    <p class="field-error">Description is required</p>
+    } -->
+
+    @if (errorMessage()) {
+    <p class="field-error">{{ errorMessage() }}</p>
+    }
+
+    <button type="submit">{{ editingId ? 'Update Task' : 'Create Task' }}</button>
+    <a routerLink="/tasks">Cancel</a>
+
+</form>

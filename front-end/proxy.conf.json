@@ -1,0 +1,7 @@
+{
+    "/api": {
+        "target": "http://todoAppC5H727.somee.com",
+        "secure": false,
+        "changeOrigin": true
+    }
+}

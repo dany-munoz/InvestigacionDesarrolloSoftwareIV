@@ -1,0 +1,35 @@
+.auth-form {
+    display: flex;
+    flex-direction: column;
+    gap: 0.4rem;
+    max-width: 320px;
+}
+
+.auth-form label {
+    font-weight: 600;
+    margin-top: 0.6rem;
+}
+
+.auth-form input {
+    padding: 0.5rem 0.6rem;
+    border: 1px solid var(--line);
+    border-radius: 6px;
+    font-size: 1rem;
+}
+
+.auth-form button {
+    margin-top: 1rem;
+    padding: 0.6rem 1rem;
+    border: none;
+    border-radius: 6px;
+    background: var(--accent);
+    color: #fff;
+    font-weight: 600;
+    cursor: pointer;
+}
+
+.field-error {
+    color: var(--danger);
+    font-size: 0.85rem;
+    margin: 0;
+}

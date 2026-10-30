@@ -1,0 +1,27 @@
+<h1>My Tasks</h1>
+<p><a routerLink="/tasks/new">Create a new task</a></p>
+
+@if (loading()) {
+<p>Loading...</p>
+} @else if (errorMessage()) {
+<p class="field-error">{{ errorMessage() }}</p>
+<p>If you haven't logged in yet, <a routerLink="/login">log in</a> and come back to this page.</p>
+} @else if (todos().length === 0) {
+<p>There's no tasks.</p>
+} @else {
+<ul class="todo-list">
+    @for (todo of todos(); track todo.id) {
+    <li class="todo-item" [class.completed]="todo.isCompleted">
+        <label class="todo-check">
+            <input type="checkbox" [checked]="todo.isCompleted" (change)="onToggle(todo)" />
+            <span class="todo-title">{{ todo.title }}</span>
+        </label>
+        <div class="todo-actions">
+            <a [routerLink]="['/tasks', todo.id, 'edit']">Edit</a>
+            <button type="button" class="delete-button" (click)="onDelete(todo)">Delete</button>
+        </div>
+    </li>
+    }
+</ul>
+<button (click)="authService.logout()">Logout</button>
+}
