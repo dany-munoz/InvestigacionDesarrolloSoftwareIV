@@ -1,5 +1,6 @@
 import { Injectable } from '@angular/core';
 import { TodoItem } from '../models/todo-item.model';
+import { PendingOperation } from '../models/pending-operation.model';
 
 @Injectable({
     providedIn: 'root',
@@ -7,7 +8,7 @@ import { TodoItem } from '../models/todo-item.model';
 export class TodoItemDatabase {
 
     private dbName = 'TaskManagerDB';
-    private dbVersion = 1;
+    private dbVersion = 2;
 
     private dbPromise: Promise<IDBDatabase> | null = null;
 
@@ -30,6 +31,13 @@ export class TodoItemDatabase {
                     });
                     store.createIndex('syncStatus', 'syncStatus', {
                         unique: false
+                    });
+                }
+
+                if (!db.objectStoreNames.contains('pending-operations')) {
+                    db.createObjectStore('pending-operations', {
+                        keyPath: 'id',
+                        autoIncrement: true,
                     });
                 }
             };
@@ -80,6 +88,52 @@ export class TodoItemDatabase {
 
             request.onsuccess = () => resolve();
             request.onerror = () => reject(request.error);
+        });
+    }
+
+    async getById(id: number): Promise<TodoItem | undefined> {
+        const db = await this.connect();
+        return new Promise((resolve, reject) => {
+            const transaction = db.transaction('todo-items', 'readonly');
+            const store = transaction.objectStore('todo-items');
+            const request = store.get(id);
+
+            request.onsuccess = () => resolve(request.result);
+            request.onerror = () => reject(request.error);
+        });
+    }
+
+    async save(item: TodoItem): Promise<void> {
+        const db = await this.connect();
+        return new Promise((resolve, reject) => {
+            const transaction = db.transaction('todo-items', 'readwrite');
+            const store = transaction.objectStore('todo-items');
+            const request = store.put(item);
+
+            request.onsuccess = () => resolve();
+            request.onerror = () => reject(request.error);
+        });
+    }
+
+    async saveWithPending(item: TodoItem, operationType: 'CREATE' | 'UPDATE'): Promise<void> {
+        const db = await this.connect();
+        return new Promise((resolve, reject) => {
+            const transaction = db.transaction(['todo-items', 'pending-operations'], 'readwrite');
+            const store = transaction.objectStore('todo-items');
+            const pendingStore = transaction.objectStore('pending-operations');
+
+            store.put(item);
+
+            const pendingOp: PendingOperation = {
+                type: operationType,
+                todoId: item.id,
+                payload: item,
+                timestamp: new Date().toISOString(),
+            };
+            pendingStore.add(pendingOp);
+
+            transaction.oncomplete = () => resolve();
+            transaction.onerror = () => reject(transaction.error);
         });
     }
 }
