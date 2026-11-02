@@ -15,6 +15,8 @@ export class TodoForm implements OnInit {
   private readonly route = inject(ActivatedRoute);
   private readonly fb = inject(FormBuilder);
 
+  pendingCount = this.todoItemService.pendingCount;
+
   form = this.fb.nonNullable.group({
     title: ['', [Validators.required, Validators.maxLength(200)]],
     description: ['', [Validators.required, Validators.maxLength(1000)]],
@@ -38,8 +40,8 @@ export class TodoForm implements OnInit {
         });
         this.existingIsCompleted = todo.isCompleted;
       },
-      error: () => this.errorMessage.set('Unable to load the task. Try again.'),
-    })
+      error: () => this.errorMessage.set('The task could not be loaded locally'),
+    });
   }
 
   onSubmit(): void {
@@ -51,7 +53,7 @@ export class TodoForm implements OnInit {
     if (this.editingId) {
       this.todoItemService.update(this.editingId, {...this.form.getRawValue(), isCompleted: this.existingIsCompleted,}).subscribe({
         next: () => this.router.navigate(['/tasks']),
-        error: () => this.errorMessage.set('Unable to update the task. Try again.'),
+        error: () => this.errorMessage.set('Error saving local changes'),
       });
       return;
     }
@@ -60,7 +62,7 @@ export class TodoForm implements OnInit {
 
     this.todoItemService.create(this.form.getRawValue()).subscribe({
       next: () => this.router.navigate(['/tasks']),
-      error: () => this.errorMessage.set('Unable to create the task. Try again.'),
+      error: () => this.errorMessage.set('Error saving the task locally'),
     })
   }
 }

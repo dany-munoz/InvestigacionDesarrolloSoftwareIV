@@ -1,5 +1,11 @@
 <h1>{{ editingId ? 'Edit Task' : 'Create Task' }}</h1>
 
+@if (pendingCount() > 0) {
+<div class="alert alert-warning py-2 mb-3">
+    Cambios pendientes de sincronizar: {{ pendingCount() }}
+</div>
+}
+
 <form [formGroup]="form" (ngSubmit)="onSubmit()" class="todo-form">
 
     <label for="title"> Title</label>

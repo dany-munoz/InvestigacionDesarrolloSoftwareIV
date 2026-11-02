@@ -1,7 +1,7 @@
 import { Injectable, inject, signal } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { environment } from '../../environments/environment';
-import { catchError, from, Observable, tap } from 'rxjs';
+import { catchError, from, Observable, switchMap, tap } from 'rxjs';
 import { TodoItem } from '../models/todo-item.model';
 import { NewTodoItem } from '../models/new-todo-item.model';
 import { UpdateTodoItem } from '../models/update-todo-item.model';
@@ -21,8 +21,8 @@ export class TodoItemService {
         this.refreshPendingCount();
     }
 
-    async refreshPendingCount() Promise<void> {
-        const count = await this.todoItemDatabase.getPendigCount();
+    async refreshPendingCount(): Promise<void> {
+        const count = await this.todoItemDatabase.getPendingCount();
         this.pendingCount.set(count);
     }
 
@@ -60,7 +60,7 @@ export class TodoItemService {
                     title: todo.title,
                     description: todo.description,
                     isCompleted: false,
-                    createAt: new Date().toISOString(),
+                    createdAt: new Date().toISOString(),
                     completedAt: null,
                 };
 
@@ -93,7 +93,7 @@ export class TodoItemService {
                     title: todo.title,
                     description: todo.description,
                     isCompleted: todo.isCompleted,
-                    createAt: existingItem?.createAt ?? new Date().toISOString(),
+                    createdAt: existingItem?.createdAt ?? new Date().toISOString(),
                     completedAt: todo.isCompleted ? new Date().toISOString() : null,
                 };
                 await this.todoItemDatabase.save(updatedItem);
@@ -104,10 +104,11 @@ export class TodoItemService {
 
                 const existingItem = await this.todoItemDatabase.getById(id);
                 const localItem: TodoItem = {
+                    id,
                     title: todo.title,
                     description: todo.description,
                     isCompleted: todo.isCompleted,
-                    createAt: existingItem?.createAt ?? new Date().toISOString(),
+                    createdAt: existingItem?.createdAt ?? new Date().toISOString(),
                     completedAt: todo.isCompleted ? new Date().toISOString() : null,
                 };
 

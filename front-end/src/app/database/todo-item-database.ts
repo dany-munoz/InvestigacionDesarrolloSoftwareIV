@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
-import { TodoItem } from '../models/todo-item.model';
 import { PendingOperation } from '../models/pending-operation.model';
+import { TodoItem } from '../models/todo-item.model';
 
 @Injectable({
     providedIn: 'root',
@@ -137,7 +137,7 @@ export class TodoItemDatabase {
         });
     }
 
-    async getPendigCount(): Promise<number> {
+    async getPendingCount(): Promise<number> {
         const db = await this.connect();
         return new Promise((resolve, reject) => {
             const transaction = db.transaction('pending-operations', 'readonly');
