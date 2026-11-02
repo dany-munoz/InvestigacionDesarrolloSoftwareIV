@@ -18,6 +18,8 @@
     "@angular/platform-browser": "^22.2.0",
     "@angular/router": "^22.2.0",
     "@angular/service-worker": "^22.2.0",
+    "bootstrap": "^5.3.8",
+    "dexie": "^4.4.7",
     "rxjs": "~7.8.0",
     "sweetalert2": "^11.26.25",
     "tslib": "^2.9.1"
