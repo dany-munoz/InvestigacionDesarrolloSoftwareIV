@@ -1,19 +1,18 @@
 import { Injectable } from '@angular/core';
 import Dexie, { Table } from 'dexie';
-import { TodoItem } from '../models/todo-item.model';
 import { PendingOperation } from '../models/pending-operation.model';
+import { TodoItem } from '../models/todo-item.model';
 
 @Injectable({
     providedIn: 'root',
 })
 export class TodoItemDatabase extends Dexie {
-    // Declaramos las tablas
     todoItems!: Table<TodoItem, number>;
     pendingOperations!: Table<PendingOperation, number>;
 
     constructor() {
         super('TaskManagerDB');
-        
+
         this.version(2).stores({
             todoItems: 'id, syncStatus',
             pendingOperations: '++id, todoId, type'
@@ -42,48 +41,24 @@ export class TodoItemDatabase extends Dexie {
 
 
     async saveWithPending(item: TodoItem, operationType: 'CREATE' | 'UPDATE'): Promise<void> {
-        const db = await this.connect();
-        return new Promise((resolve, reject) => {
-            const transaction = db.transaction(['todo-items', 'pending-operations'], 'readwrite');
-            const store = transaction.objectStore('todo-items');
-            const pendingStore = transaction.objectStore('pending-operations');
+        await this.transaction('rw', this.todoItems, this.pendingOperations, async () => {
+            await this.todoItems.put(item);
 
-            store.put(item);
-
-            const pendingOp: PendingOperation = {
+            const pendingOp = {
                 type: operationType,
                 todoId: item.id,
                 payload: item,
                 timestamp: new Date().toISOString(),
-            };
-            pendingStore.add(pendingOp);
-
-            transaction.oncomplete = () => resolve();
-            transaction.onerror = () => reject(transaction.error);
+            } as PendingOperation;
+            await this.pendingOperations.add(pendingOp);
         });
     }
 
     async getPendingCount(): Promise<number> {
-        const db = await this.connect();
-        return new Promise((resolve, reject) => {
-            const transaction = db.transaction('pending-operations', 'readonly');
-            const store = transaction.objectStore('pending-operations');
-            const request = store.count();
-
-            request.onsuccess = () => resolve(request.result);
-            request.onerror = () => reject(request.error);
-        });
+        return await this.pendingOperations.count();
     }
 
     async getAllPending(): Promise<PendingOperation[]> {
-        const db = await this.connect();
-        return new Promise((resolve, reject) => {
-            const transaction = db.transaction('pending-operations', 'readonly');
-            const store = transaction.objectStore('pending-operations');
-            const request = store.getAll();
-
-            request.onsuccess = () => resolve(request.result);
-            request.onerror = () => reject(request.error);
-        });
+        return await this.pendingOperations.toArray();
     }
 }

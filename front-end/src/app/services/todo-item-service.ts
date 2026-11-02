@@ -1,11 +1,11 @@
-import { Injectable, inject, signal } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { environment } from '../../environments/environment';
+import { inject, Injectable, signal } from '@angular/core';
 import { catchError, from, Observable, switchMap, tap } from 'rxjs';
-import { TodoItem } from '../models/todo-item.model';
-import { NewTodoItem } from '../models/new-todo-item.model';
-import { UpdateTodoItem } from '../models/update-todo-item.model';
+import { environment } from '../../environments/environment';
 import { TodoItemDatabase } from '../database/todo-item-database';
+import { NewTodoItem } from '../models/new-todo-item.model';
+import { TodoItem } from '../models/todo-item.model';
+import { UpdateTodoItem } from '../models/update-todo-item.model';
 
 @Injectable({
     providedIn: 'root',
@@ -57,7 +57,7 @@ export class TodoItemService {
             tap(async (createdItem) => {
                 await this.todoItemDatabase.save(createdItem);
             }),
-            catchError(async (error) => {
+            catchError((error) => {
                 console.warn('No connection, saving task creation to the local queue.', error);
 
                 const tempId = -Math.floor(Math.random() * 100000);
@@ -70,22 +70,30 @@ export class TodoItemService {
                     completedAt: null,
                 };
 
-                await this.todoItemDatabase.saveWithPending(localItem, 'CREATE');
-                await this.refreshPendingCount();
-                return localItem;
+                return from(
+                    (async () => {
+                        await this.todoItemDatabase.saveWithPending(localItem, 'CREATE');
+                        await this.refreshPendingCount();
+                        return localItem;
+                    })()
+                );
             })
         );
     }
 
     getById(id: number): Observable<TodoItem> {
         return this.http.get<TodoItem>(`${this.baseUrl}/${id}`).pipe(
-            catchError(async (error) => {
+            catchError((error) => {
                 console.warn('No connection, searching for the task in local storage.', error);
-                const localItem = await this.todoItemDatabase.getById(id);
-                if (!localItem) {
-                    throw new Error('The task does not exist in the local database');
-                }
-                return localItem;
+
+                return from(
+                    this.todoItemDatabase.getById(id).then((localItem) => {
+                        if (!localItem) {
+                            throw new Error('The task does not exist in the local database');
+                        }
+                        return localItem;
+                    })
+                );
             })
         );
     }
@@ -105,22 +113,26 @@ export class TodoItemService {
                 await this.todoItemDatabase.save(updatedItem);
                 return updatedItem;
             }),
-            catchError(async (error) => {
+            catchError((error) => {
                 console.warn('No connection, saving task edit to the local queue', error);
 
-                const existingItem = await this.todoItemDatabase.getById(id);
-                const localItem: TodoItem = {
-                    id,
-                    title: todo.title,
-                    description: todo.description,
-                    isCompleted: todo.isCompleted,
-                    createdAt: existingItem?.createdAt ?? new Date().toISOString(),
-                    completedAt: todo.isCompleted ? new Date().toISOString() : null,
-                };
+                return from(
+                    (async () => {
+                        const existingItem = await this.todoItemDatabase.getById(id);
+                        const localItem: TodoItem = {
+                            id,
+                            title: todo.title,
+                            description: todo.description,
+                            isCompleted: todo.isCompleted,
+                            createdAt: existingItem?.createdAt ?? new Date().toISOString(),
+                            completedAt: todo.isCompleted ? new Date().toISOString() : null,
+                        };
 
-                await this.todoItemDatabase.saveWithPending(localItem, 'UPDATE');
-                await this.refreshPendingCount();
-                return localItem;
+                        await this.todoItemDatabase.saveWithPending(localItem, 'UPDATE');
+                        await this.refreshPendingCount();
+                        return localItem;
+                    })()
+                )
             })
         );
     }
