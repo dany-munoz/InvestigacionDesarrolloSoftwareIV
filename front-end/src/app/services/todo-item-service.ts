@@ -47,7 +47,28 @@ export class TodoItemService {
     }
 
     create(todo: NewTodoItem): Observable<TodoItem> {
-        return this.http.post<TodoItem>(this.baseUrl, todo);
+        return this.http.post<TodoItem>(this.baseUrl, todo).pipe(
+            tap(async (createdItem) => {
+                await this.todoItemDatabase.save(createdItem);
+            }),
+            catchError(async (error) => {
+                console.warn('No connection, saving task creation to the local queue.', error);
+
+                const tempId = -Math.floor(Math.random() * 100000);
+                const localItem: TodoItem = {
+                    id: tempId,
+                    title: todo.title,
+                    description: todo.description,
+                    isCompleted: false,
+                    createAt: new Date().toISOString(),
+                    completedAt: null,
+                };
+
+                await this.todoItemDatabase.saveWithPending(localItem, 'CREATE');
+                await this.refreshPendingCount();
+                return localItem;
+            })
+        );
     }
 
     getById(id: number): Observable<TodoItem> {
@@ -64,6 +85,36 @@ export class TodoItemService {
     }
 
     update(id: number, todo: UpdateTodoItem): Observable<TodoItem> {
-        return this.http.put<TodoItem>(`${this.baseUrl}/${id}`, todo);
+        return this.http.put<void>(`${this.baseUrl}/${id}`, todo).pipe(
+            switchMap(async () => {
+                const existingItem = await this.todoItemDatabase.getById(id);
+                const updatedItem: TodoItem = {
+                    id,
+                    title: todo.title,
+                    description: todo.description,
+                    isCompleted: todo.isCompleted,
+                    createAt: existingItem?.createAt ?? new Date().toISOString(),
+                    completedAt: todo.isCompleted ? new Date().toISOString() : null,
+                };
+                await this.todoItemDatabase.save(updatedItem);
+                return updatedItem;
+            }),
+            catchError(async (error) => {
+                console.warn('No connection, saving task edit to the local queue', error);
+
+                const existingItem = await this.todoItemDatabase.getById(id);
+                const localItem: TodoItem = {
+                    title: todo.title,
+                    description: todo.description,
+                    isCompleted: todo.isCompleted,
+                    createAt: existingItem?.createAt ?? new Date().toISOString(),
+                    completedAt: todo.isCompleted ? new Date().toISOString() : null,
+                };
+
+                await this.todoItemDatabase.saveWithPending(localItem, 'UPDATE');
+                await this.refreshPendingCount();
+                return localItem;
+            })
+        );
     }
 }
