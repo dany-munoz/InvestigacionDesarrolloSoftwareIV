@@ -17,7 +17,7 @@ export class TodoItemService {
 
     pendingCount = signal<number>(0);
 
-    constructor(){
+    constructor() {
         this.refreshPendingCount();
     }
 
@@ -28,10 +28,16 @@ export class TodoItemService {
 
     getAll(): Observable<TodoItem[]> {
         return this.http.get<TodoItem[]>(this.baseUrl).pipe(
-            tap(async (todoItems) => {
-                await this.todoItemDatabase.saveAll(todoItems);
+            switchMap(async (serverItems) => {
+                const pendingOps = await this.todoItemDatabase.getAllPending();
+                const pendingIds = new Set(pendingOps.map(op => op.todoId));
+
+                const itemsToSave = serverItems.filter(item => !pendingIds.has(item.id));
+                await this.todoItemDatabase.saveAll(itemsToSave);
+
+                return await this.todoItemDatabase.getAll();
             }),
-            catchError( (error) => {
+            catchError((error) => {
                 console.error('Error connecting to API: loading local data', error);
                 return from(this.todoItemDatabase.getAll());
             })
