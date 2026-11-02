@@ -136,4 +136,28 @@ export class TodoItemDatabase {
             transaction.onerror = () => reject(transaction.error);
         });
     }
+
+    async getPendigCount(): Promise<number> {
+        const db = await this.connect();
+        return new Promise((resolve, reject) => {
+            const transaction = db.transaction('pending-operations', 'readonly');
+            const store = transaction.objectStore('pending-operations');
+            const request = store.count();
+
+            request.onsuccess = () => resolve(request.result);
+            request.onerror = () => reject(request.error);
+        });
+    }
+
+    async getAllPending(): Promise<PendingOperation[]> {
+        const db = await this.connect();
+        return new Promise((resolve, reject) => {
+            const transaction = db.transaction('pending-operations', 'readonly');
+            const store = transaction.objectStore('pending-operations');
+            const request = store.getAll();
+
+            request.onsuccess = () => resolve(request.result);
+            request.onerror = () => reject(request.error);
+        });
+    }
 }
