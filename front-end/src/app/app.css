@@ -17,3 +17,81 @@
   margin: 0 auto;
   padding: 2rem 1.5rem;
 }
+
+.sync-panel {
+  margin-bottom: 2rem;
+  padding: 1rem;
+  border: 1px solid var(--line);
+  border-radius: 0.75rem;
+  background: var(--surface);
+  color: var(--ink);
+}
+
+.sync-panel-heading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+}
+
+.sync-panel-heading h2 {
+  margin: 0;
+  font-size: 1rem;
+}
+
+.sync-details {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 1rem;
+  margin: 1rem 0;
+}
+
+.sync-details dt {
+  margin-bottom: 0.25rem;
+  color: var(--ink-soft);
+  font-size: 0.85rem;
+}
+
+.sync-details dd {
+  margin: 0;
+  font-weight: 600;
+  overflow-wrap: anywhere;
+}
+
+.sync-message {
+  margin: 0;
+  padding-top: 0.75rem;
+  border-top: 1px solid var(--line);
+  line-height: 1.5;
+}
+
+.sync-button {
+  padding: 0.5rem 0.75rem;
+  border: 1px solid var(--accent);
+  border-radius: 0.4rem;
+  background: var(--accent);
+  color: #fff;
+  font: inherit;
+  cursor: pointer;
+}
+
+.sync-button:hover:not(:disabled) {
+  background: var(--accent-ink);
+}
+
+.sync-button:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 3px;
+}
+
+.sync-button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+@media (max-width: 480px) {
+  .sync-details {
+    grid-template-columns: 1fr;
+  }
+}

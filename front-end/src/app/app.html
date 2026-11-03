@@ -3,5 +3,55 @@
 </header>
 
 <main class="app-main">
+    <section class="sync-panel" aria-labelledby="sync-title">
+    <div class="sync-panel-heading">
+      <h2 id="sync-title">Sincronización</h2>
+
+      <button
+        type="button"
+        class="sync-button"
+        [disabled]="sync.syncing() || !sync.networkAvailable()"
+        (click)="sync.sync()"
+      >
+        {{ sync.syncing() ? 'Sincronizando...' : 'Sincronizar ahora' }}
+      </button>
+    </div>
+
+    <dl class="sync-details">
+      <div>
+        <dt>Red</dt>
+        <dd>
+          {{ sync.networkAvailable() ? 'Disponible' : 'Sin conexión' }}
+        </dd>
+      </div>
+
+      <div>
+        <dt>API</dt>
+        <dd>
+          @if (sync.apiAvailable() === null) {
+            Sin confirmar
+          } @else if (sync.apiAvailable()) {
+            Accesible
+          } @else {
+            No accesible
+          }
+        </dd>
+      </div>
+
+      <div>
+        <dt>Cambios pendientes</dt>
+        <dd>{{ sync.pendingCount() }}</dd>
+      </div>
+
+      <div>
+        <dt>Última sincronización</dt>
+        <dd>{{ sync.lastSync() ?? 'Todavía no realizada' }}</dd>
+      </div>
+    </dl>
+
+    <p class="sync-message" role="status" aria-live="polite">
+      {{ sync.message() }}
+    </p>
+  </section>
   <router-outlet></router-outlet>
 </main>
