@@ -4,6 +4,11 @@ import Swal from 'sweetalert2';
 import { TodoItem } from '../../models/todo-item.model';
 import { Auth } from '../../services/auth';
 import { TodoItemService } from '../../services/todo-item-service';
+import { DestroyRef } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { EMPTY, catchError, from, switchMap } from 'rxjs';
+import { TodoItemDatabase } from '../../database/todo-item-database';
+import { SyncService } from '../../services/sync-service';
 
 @Component({
   selector: 'app-todo-list',
@@ -15,12 +20,44 @@ import { TodoItemService } from '../../services/todo-item-service';
 export class TodoList implements OnInit {
   private readonly authService = inject(Auth);
   private readonly todoItemService = inject(TodoItemService);
+    private readonly syncService = inject(SyncService);
+  private readonly todoItemDatabase = inject(TodoItemDatabase);
+  private readonly destroyRef = inject(DestroyRef);
 
   pendingCount = this.todoItemService.pendingCount;
 
   todos = signal<TodoItem[]>([]);
   loading = signal(true);
   errorMessage = signal('');
+
+  constructor() {
+    this.syncService.completed$
+      .pipe(
+        switchMap(() =>
+          from(this.todoItemDatabase.getAll()).pipe(
+            catchError((error: unknown) => {
+              console.error(
+                'Error al actualizar la lista después de sincronizar:',
+                error
+              );
+
+              this.errorMessage.set(
+                'No se pudo actualizar la lista de tareas.'
+              );
+
+              return EMPTY;
+            })
+          )
+        ),
+        takeUntilDestroyed(this.destroyRef)
+      )
+      .subscribe((todos) => {
+        this.todos.set(todos);
+        this.loading.set(false);
+        this.errorMessage.set('');
+      });
+  }
+
   ngOnInit(): void {
     this.todoItemService.getAll().subscribe({
       next: (todos) => {
