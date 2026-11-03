@@ -60,13 +60,26 @@ export class TodoList implements OnInit {
 
   ngOnInit(): void {
     this.todoItemService.getAll().subscribe({
-      next: (todos) => {
+      next: async (todos) => {
         this.todos.set(todos);
         this.loading.set(false);
+        
+        try {
+          await this.todoItemDatabase.todoItems.bulkPut(todos);
+        } catch (error) {
+          console.error("Error guardando en la base de datos local:", error);
+        }
       },
-      error: () => {
-        this.errorMessage.set('Tasks could not be loaded.');
-        this.loading.set(false);
+      error: async () => {
+        try {
+          const localTodos = await this.todoItemDatabase.todoItems.toArray();
+          this.todos.set(localTodos);
+          this.errorMessage.set('');
+        } catch (localError) {
+          this.errorMessage.set('Tasks could not be loaded.');
+        } finally {
+          this.loading.set(false);
+        }
       },
     });
   }

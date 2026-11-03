@@ -29,5 +29,11 @@
     </li>
     }
 </ul>
+
+@if (authService.isLoggedIn()) {
 <button (click)="authService.logout()">Logout</button>
+} @else {
+<button (routerLink="/")>Go back</button>
+}
+
 }
