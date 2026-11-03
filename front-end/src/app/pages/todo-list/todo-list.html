@@ -1,6 +1,12 @@
 <h1>My Tasks</h1>
 <p><a routerLink="/tasks/new">Create a new task</a></p>
 
+@if (pendingCount() > 0) {
+<div class="alert alert-warning py-2 mb-3">
+    Cambios pendientes de sincronizar: {{ pendingCount() }}
+</div>
+}
+
 @if (loading()) {
 <p>Loading...</p>
 } @else if (errorMessage()) {

@@ -1,9 +1,9 @@
 import { Component, OnInit, inject, signal } from '@angular/core';
 import { RouterLink } from '@angular/router';
-import { TodoItemService } from '../../services/todo-item-service';
-import { TodoItem } from '../../models/todo-item.model';
 import Swal from 'sweetalert2';
+import { TodoItem } from '../../models/todo-item.model';
 import { Auth } from '../../services/auth';
+import { TodoItemService } from '../../services/todo-item-service';
 import { TodoItemDatabase } from '../../database/todo-item-database';
 
 @Component({
@@ -17,6 +17,8 @@ export class TodoList implements OnInit {
   private readonly authService = inject(Auth);
   private readonly todoItemService = inject(TodoItemService);
   private readonly todoItemDatabase = inject(TodoItemDatabase);
+
+  pendingCount = this.todoItemService.pendingCount;
 
   todos = signal<TodoItem[]>([]);
   loading = signal(true);
