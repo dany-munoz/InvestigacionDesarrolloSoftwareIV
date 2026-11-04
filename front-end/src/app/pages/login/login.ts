@@ -16,8 +16,8 @@ export class Login {
   private readonly router = inject(Router);
 
   form = this.fb.nonNullable.group({
-    userName: ['',Validators.required],
-    password: ['',Validators.required],
+    userName: ['', Validators.required],
+    password: ['', Validators.required],
   });
 
   errorMessage = signal('');
@@ -26,14 +26,18 @@ export class Login {
     if (this.form.invalid) {
       this.form.markAllAsTouched();
       return;
-    } 
+    }
 
     this.errorMessage.set('');
 
     this.authService.login(this.form.getRawValue()).subscribe({
       next: () => this.router.navigate(['/']),
       error: (err: HttpErrorResponse) => {
-        this.errorMessage.set(typeof err.error === 'string' ? err.error : 'No se pudo iniciar sesión. Por favor, inténtalo de nuevo más tarde.');
+        if (err.status === 401) {
+          this.errorMessage.set('Nombre de usuario o contraseña incorrectos.');
+        } else {
+          this.errorMessage.set(typeof err.error === 'string' ? err.error : 'No se pudo iniciar sesión. Por favor, inténtalo de nuevo más tarde.');
+        }
       },
     })
   }
