@@ -1,35 +1,133 @@
+/* Contenedor principal para centrar la vista */
+.login-wrapper {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 80vh;
+    font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+    background-color: #f4f6f8;
+}
+
+/* Tarjeta principal estilo app[cite: 1] */
+.login-card {
+    background: #ffffff;
+    padding: 3rem 2.5rem;
+    border-radius: 12px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+    width: 100%;
+    max-width: 400px;
+    border: 1px solid #eaeaea;
+}
+
+.logo-text {
+    font-size: 2.2rem;
+    color: #1a1a2e;
+    margin-top: 0;
+    margin-bottom: 0.2rem;
+    font-weight: 800;
+    text-align: center;
+}
+
+.page-title {
+    font-size: 1.1rem;
+    color: #6c757d;
+    text-align: center;
+    margin-bottom: 2rem;
+    font-weight: 500;
+}
+
+/* Formulario */
 .auth-form {
     display: flex;
     flex-direction: column;
-    gap: 0.4rem;
-    max-width: 320px;
+    gap: 1.2rem;
 }
 
-.auth-form label {
+.form-group {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    text-align: left;
+}
+
+label {
+    font-size: 0.95rem;
     font-weight: 600;
-    margin-top: 0.6rem;
+    color: #333;
 }
 
-.auth-form input {
-    padding: 0.5rem 0.6rem;
-    border: 1px solid var(--line);
+/* Inputs de texto */
+.form-control {
+    padding: 0.8rem 1rem;
+    border: 1px solid #ccc;
     border-radius: 6px;
     font-size: 1rem;
+    transition: border-color 0.2s, box-shadow 0.2s;
+    outline: none;
 }
 
-.auth-form button {
-    margin-top: 1rem;
-    padding: 0.6rem 1rem;
-    border: none;
-    border-radius: 6px;
-    background: var(--accent);
-    color: #fff;
-    font-weight: 600;
-    cursor: pointer;
+.form-control:focus {
+    border-color: #4b38d3;
+    /* Color índigo[cite: 1] */
+    box-shadow: 0 0 0 3px rgba(75, 56, 211, 0.15);
 }
 
+/* Mensajes de error */
 .field-error {
-    color: var(--danger);
+    color: #d32f2f;
     font-size: 0.85rem;
     margin: 0;
+    font-weight: 500;
+}
+
+.global-error {
+    color: #d32f2f;
+    text-align: center;
+    background-color: #fdeaea;
+    padding: 0.8rem;
+    border-radius: 6px;
+    font-size: 0.9rem;
+    font-weight: 500;
+    margin: 0;
+}
+
+/* Botón principal[cite: 1] */
+.btn-primary {
+    background-color: #4b38d3;
+    color: white;
+    padding: 1rem;
+    border-radius: 6px;
+    font-weight: 600;
+    font-size: 1rem;
+    transition: background-color 0.2s ease;
+    border: none;
+    cursor: pointer;
+    margin-top: 0.5rem;
+}
+
+.btn-primary:hover:not(:disabled) {
+    background-color: #3a2bb3;
+}
+
+/* Estado deshabilitado si el formulario es inválido */
+.btn-primary:disabled {
+    background-color: #a097d6;
+    cursor: not-allowed;
+}
+
+/* Enlace de regreso */
+.back-link {
+    text-align: center;
+    margin-top: 1.5rem;
+    font-size: 0.95rem;
+}
+
+.back-link a {
+    color: #4b38d3;
+    text-decoration: none;
+    font-weight: 600;
+}
+
+.back-link a:hover {
+    text-decoration: underline;
 }

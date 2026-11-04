@@ -1,33 +1,42 @@
-<h1>{{ editingId ? 'Edit Task' : 'Create Task' }}</h1>
+<div class="form-wrapper">
+    <div class="form-card">
+        <h1 class="page-title">{{ editingId ? 'Edit Task' : 'Create Task' }}</h1>
 
-@if (pendingCount() > 0) {
-<div class="alert alert-warning py-2 mb-3">
-    Cambios pendientes de sincronizar: {{ pendingCount() }}
+        @if (pendingCount() > 0) {
+        <div class="alert alert-warning">
+            Cambios pendientes de sincronizar: <strong>{{ pendingCount() }}</strong>
+        </div>
+        }
+
+        <form [formGroup]="form" (ngSubmit)="onSubmit()" class="todo-form">
+
+            <div class="form-group">
+                <label for="title">Titulo</label>
+                <input id="title" type="text" formControlName="title" autocomplete="title" class="form-control"
+                    placeholder="Titulo de la tarea..." />
+
+                @if (form.controls.title.invalid && form.controls.title.touched) {
+                <p class="field-error">El titulo es requerido</p>
+                }
+            </div>
+
+            <div class="form-group">
+                <label for="description">Descripción <span class="text-muted">(Opcional)</span></label>
+                <input id="description" type="text" formControlName="description" autocomplete="description"
+                    class="form-control" placeholder="Detalles de la tarea..." />
+            </div>
+
+            @if (errorMessage()) {
+            <p class="global-error">{{ errorMessage() }}</p>
+            }
+
+            <div class="action-group">
+                <button type="submit" class="btn-primary" [disabled]="form.invalid">
+                    {{ editingId ? 'Actualizar Tarea' : 'Crear Tarea' }}
+                </button>
+                <a routerLink="/tasks" class="btn-secondary">Cancelar</a>
+            </div>
+
+        </form>
+    </div>
 </div>
-}
-
-<form [formGroup]="form" (ngSubmit)="onSubmit()" class="todo-form">
-
-    <label for="title"> Title</label>
-    <input id="title" type="text" formControlName="title" autocomplete="title" />
-
-    @if (form.controls.title.invalid && form.controls.title.touched) {
-    <p class="field-error">Title is required</p>
-    }
-
-
-    <label for="description">Description</label>
-    <input id="description" type="text" formControlName="description" autocomplete="description" />
-
-    <!-- @if (form.controls.description.invalid && form.controls.description.touched) {
-    <p class="field-error">Description is required</p>
-    } -->
-
-    @if (errorMessage()) {
-    <p class="field-error">{{ errorMessage() }}</p>
-    }
-
-    <button type="submit">{{ editingId ? 'Update Task' : 'Create Task' }}</button>
-    <a routerLink="/tasks">Cancel</a>
-
-</form>

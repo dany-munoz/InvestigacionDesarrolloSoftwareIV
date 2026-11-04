@@ -19,7 +19,7 @@ export class TodoForm implements OnInit {
 
   form = this.fb.nonNullable.group({
     title: ['', [Validators.required, Validators.maxLength(200)]],
-    description: ['', [Validators.required, Validators.maxLength(1000)]],
+    description: ['', [Validators.maxLength(1000)]],
   });
 
   errorMessage = signal('');
@@ -40,7 +40,7 @@ export class TodoForm implements OnInit {
         });
         this.existingIsCompleted = todo.isCompleted;
       },
-      error: () => this.errorMessage.set('The task could not be loaded locally'),
+      error: () => this.errorMessage.set('Las tareas no se pudieron cargar. Por favor, inténtalo de nuevo más tarde.'),
     });
   }
 
@@ -53,7 +53,7 @@ export class TodoForm implements OnInit {
     if (this.editingId) {
       this.todoItemService.update(this.editingId, {...this.form.getRawValue(), isCompleted: this.existingIsCompleted,}).subscribe({
         next: () => this.router.navigate(['/tasks']),
-        error: () => this.errorMessage.set('Error saving local changes'),
+        error: () => this.errorMessage.set('Error al actualizar la tarea localmente'),
       });
       return;
     }
@@ -62,7 +62,7 @@ export class TodoForm implements OnInit {
 
     this.todoItemService.create(this.form.getRawValue()).subscribe({
       next: () => this.router.navigate(['/tasks']),
-      error: () => this.errorMessage.set('Error saving the task locally'),
+      error: () => this.errorMessage.set('Error al crear la tarea localmente'),
     })
   }
 }

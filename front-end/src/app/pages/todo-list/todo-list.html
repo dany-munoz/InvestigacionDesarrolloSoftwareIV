@@ -1,39 +1,59 @@
-<h1>My Tasks</h1>
-<p><a routerLink="/tasks/new">Create a new task</a></p>
+<div class="list-wrapper">
+    <div class="list-card">
 
-@if (pendingCount() > 0) {
-<div class="alert alert-warning py-2 mb-3">
-    Cambios pendientes de sincronizar: {{ pendingCount() }}
-</div>
-}
-
-@if (loading()) {
-<p>Loading...</p>
-} @else if (errorMessage()) {
-<p class="field-error">{{ errorMessage() }}</p>
-<p>If you haven't logged in yet, <a routerLink="/login">log in</a> and come back to this page.</p>
-} @else if (todos().length === 0) {
-<p>There's no tasks.</p>
-} @else {
-<ul class="todo-list">
-    @for (todo of todos(); track todo.id) {
-    <li class="todo-item" [class.completed]="todo.isCompleted">
-        <label class="todo-check">
-            <input type="checkbox" [checked]="todo.isCompleted" (change)="onToggle(todo)" />
-            <span class="todo-title">{{ todo.title }}</span>
-        </label>
-        <div class="todo-actions">
-            <a [routerLink]="['/tasks', todo.id, 'edit']">Edit</a>
-            <button type="button" class="delete-button" (click)="onDelete(todo)">Delete</button>
+        <div class="header-section">
+            <h1 class="page-title">Mis Tareas</h1>
+            <a routerLink="/tasks/new" class="btn-primary">+ Nueva Tarea</a>
         </div>
-    </li>
-    }
-</ul>
 
-@if (authService.isLoggedIn()) {
-<button (click)="authService.logout()">Logout</button>
-} @else {
-<button (routerLink="/")>Go back</button>
-}
+        @if (pendingCount() > 0) {
+        <div class="alert alert-warning">
+            Cambios pendientes de sincronizar: <strong>{{ pendingCount() }}</strong>
+        </div>
+        }
 
-}
+        <div class="content-body">
+            @if (loading()) {
+            <div class="state-message">
+                <p>Cargando tareas...</p>
+            </div>
+            } @else if (errorMessage()) {
+            <div class="state-message error">
+                <p class="field-error">{{ errorMessage() }}</p>
+                <p>Si aún no has iniciado sesión, <a routerLink="/login" class="link-inline">inicia sesión</a> y vuelve
+                    a intentarlo.</p>
+            </div>
+            } @else if (todos().length === 0) {
+            <div class="state-message empty">
+                <p>No tienes tareas pendientes.</p>
+            </div>
+            } @else {
+            <ul class="todo-list">
+                @for (todo of todos(); track todo.id) {
+                <li class="todo-item" [class.completed]="todo.isCompleted">
+                    <label class="todo-check">
+                        <input type="checkbox" [checked]="todo.isCompleted" (change)="onToggle(todo)"
+                            class="checkbox-input" />
+                        <span class="todo-title">{{ todo.title }}</span>
+                    </label>
+
+                    <div class="todo-actions">
+                        <a [routerLink]="['/tasks', todo.id, 'edit']" class="btn-edit">Editar</a>
+                        <button type="button" class="delete-button" (click)="onDelete(todo)">Eliminar</button>
+                    </div>
+                </li>
+                }
+            </ul>
+            }
+        </div>
+
+        <div class="footer-section">
+            @if (authService.isLoggedIn()) {
+            <button (click)="authService.logout()" class="btn-secondary">Cerrar sesión</button>
+            } @else {
+            <a routerLink="/" class="btn-secondary">Volver al inicio</a>
+            }
+        </div>
+
+    </div>
+</div>

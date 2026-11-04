@@ -76,7 +76,7 @@ export class TodoList implements OnInit {
           this.todos.set(localTodos);
           this.errorMessage.set('');
         } catch (localError) {
-          this.errorMessage.set('Tasks could not be loaded.');
+          this.errorMessage.set('Las tareas no se pudieron cargar. Por favor, inténtalo de nuevo más tarde.');
         } finally {
           this.loading.set(false);
         }
@@ -91,7 +91,7 @@ export class TodoList implements OnInit {
       error: () => Swal.fire({
         icon: "error",
         title: "Error",
-        text: "Task could not be updated.",
+        text: "No se pudo actualizar la tarea.",
         showConfirmButton: false,
       }),
     });
@@ -116,7 +116,7 @@ export class TodoList implements OnInit {
 
       this.todoItemService.delete(todo.id).subscribe({
         next: () => this.todos.update((current) => current.filter((t) => t.id !== todo.id)),
-        error: () => this.errorMessage.set('Task could not be deleted.'),
+        error: () => this.errorMessage.set('No se pudo eliminar la tarea.'),
       });
     });
 

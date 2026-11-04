@@ -1,10 +1,20 @@
-<h1>TodoApp</h1>
+<div class="home-wrapper">
+    <div class="home-card">
+        <h1 class="logo-text">TodoApp</h1>
 
-@if (authService.isLoggedIn()) {
-<p>Logged in.</p>
-<p><a routerLink="/tasks">View My Tasks</a></p>
-<button (click)="authService.logout()">Logout</button>
-} @else {
-<p>You haven't logged in yet.</p>
-<p><a routerLink="/login">Log in</a></p>
-}
+        <div class="content-container">
+            @if (authService.isLoggedIn()) {
+            <p class="status-text success">¡Bienvenido de vuelta!</p>
+            <div class="action-group">
+                <a routerLink="/tasks" class="btn-primary">Ver mis tareas</a>
+                <button (click)="authService.logout()" class="btn-secondary">Cerrar sesión</button>
+            </div>
+            } @else {
+            <p class="status-text">Aún no has iniciado sesión.</p>
+            <div class="action-group">
+                <a routerLink="/login" class="btn-primary">Iniciar sesión</a>
+            </div>
+            }
+        </div>
+    </div>
+</div>

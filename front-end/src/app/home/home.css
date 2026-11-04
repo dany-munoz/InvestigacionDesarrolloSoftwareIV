@@ -1,0 +1,90 @@
+/* Contenedor principal que centra la tarjeta y da un fondo sutil */
+.home-wrapper {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 80vh;
+    font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+    background-color: #f4f6f8;
+    /* Mismo tono gris claro del fondo */
+}
+
+/* Tarjeta principal estilo "Sincronización" */
+.home-card {
+    background: #ffffff;
+    padding: 3rem 2.5rem;
+    border-radius: 12px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+    text-align: center;
+    width: 100%;
+    max-width: 420px;
+    border: 1px solid #eaeaea;
+}
+
+/* Título de la app */
+.logo-text {
+    font-size: 2.2rem;
+    color: #1a1a2e;
+    margin-top: 0;
+    margin-bottom: 1.5rem;
+    font-weight: 800;
+    letter-spacing: -0.5px;
+}
+
+/* Textos de estado */
+.status-text {
+    color: #6c757d;
+    margin-bottom: 2rem;
+    font-size: 1.1rem;
+}
+
+.status-text.success {
+    color: #4b38d3;
+    font-weight: 500;
+}
+
+/* Agrupación de los botones */
+.action-group {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+/* Botón principal (Estilo morado) */
+.btn-primary {
+    background-color: #4b38d3;
+    /* Color índigo/morado de tu diseño */
+    color: white;
+    padding: 0.9rem 1.5rem;
+    border-radius: 6px;
+    text-decoration: none;
+    font-weight: 600;
+    font-size: 1rem;
+    transition: background-color 0.2s ease;
+    border: none;
+    cursor: pointer;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.btn-primary:hover {
+    background-color: #3a2bb3;
+}
+
+/* Botón secundario (Para el logout) */
+.btn-secondary {
+    background-color: transparent;
+    color: #4b38d3;
+    padding: 0.9rem 1.5rem;
+    border-radius: 6px;
+    font-weight: 600;
+    font-size: 1rem;
+    transition: all 0.2s ease;
+    border: 2px solid #4b38d3;
+    cursor: pointer;
+}
+
+.btn-secondary:hover {
+    background-color: #f8f7ff;
+}

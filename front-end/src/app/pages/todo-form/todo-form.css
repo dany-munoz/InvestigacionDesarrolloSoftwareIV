@@ -1,0 +1,159 @@
+/* Contenedor principal alineado con el resto de la app */
+.form-wrapper {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 80vh;
+    font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+    background-color: #f4f6f8;
+    /* Fondo gris claro */
+    padding: 2rem 1rem;
+}
+
+/* Tarjeta principal */
+.form-card {
+    background: #ffffff;
+    padding: 2.5rem;
+    border-radius: 12px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+    width: 100%;
+    max-width: 450px;
+    border: 1px solid #eaeaea;
+}
+
+.page-title {
+    font-size: 1.8rem;
+    color: #1a1a2e;
+    margin-top: 0;
+    margin-bottom: 1.5rem;
+    font-weight: 800;
+    text-align: center;
+    letter-spacing: -0.5px;
+}
+
+/* Alerta para los cambios pendientes */
+.alert {
+    padding: 0.8rem 1rem;
+    border-radius: 6px;
+    margin-bottom: 1.5rem;
+    font-size: 0.95rem;
+    text-align: center;
+}
+
+.alert-warning {
+    background-color: #fff3cd;
+    color: #856404;
+    border: 1px solid #ffeeba;
+}
+
+/* Estructura del formulario */
+.todo-form {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+}
+
+.form-group {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+label {
+    font-size: 0.95rem;
+    font-weight: 600;
+    color: #333;
+}
+
+/* Inputs */
+.form-control {
+    padding: 0.8rem 1rem;
+    border: 1px solid #ccc;
+    border-radius: 6px;
+    font-size: 1rem;
+    transition: border-color 0.2s, box-shadow 0.2s;
+    outline: none;
+    background-color: #fafafa;
+}
+
+.form-control:focus {
+    background-color: #ffffff;
+    border-color: #4b38d3;
+    box-shadow: 0 0 0 3px rgba(75, 56, 211, 0.15);
+}
+
+/* Errores */
+.field-error {
+    color: #d32f2f;
+    font-size: 0.85rem;
+    margin: 0;
+    font-weight: 500;
+}
+
+.global-error {
+    color: #d32f2f;
+    text-align: center;
+    background-color: #fdeaea;
+    padding: 0.8rem;
+    border-radius: 6px;
+    font-size: 0.9rem;
+    font-weight: 500;
+    margin: 0;
+}
+
+/* Botones (Guardar y Cancelar) */
+.action-group {
+    display: flex;
+    flex-direction: column;
+    gap: 0.8rem;
+    margin-top: 0.5rem;
+}
+
+.btn-primary {
+    background-color: #4b38d3;
+    color: white;
+    padding: 1rem;
+    border-radius: 6px;
+    font-weight: 600;
+    font-size: 1rem;
+    transition: background-color 0.2s ease;
+    border: none;
+    cursor: pointer;
+    text-align: center;
+}
+
+.btn-primary:hover:not(:disabled) {
+    background-color: #3a2bb3;
+}
+
+.btn-primary:disabled {
+    background-color: #a097d6;
+    cursor: not-allowed;
+}
+
+.btn-secondary {
+    background-color: transparent;
+    color: #6c757d;
+    padding: 0.9rem;
+    border-radius: 6px;
+    font-weight: 600;
+    font-size: 1rem;
+    transition: all 0.2s ease;
+    border: 1px solid #d1d5db;
+    cursor: pointer;
+    text-decoration: none;
+    text-align: center;
+}
+
+.btn-secondary:hover {
+    background-color: #f8f9fa;
+    color: #1a1a2e;
+    border-color: #9ca3af;
+}
+
+.text-muted {
+    font-size: 0.8rem;
+    color: #6c757d;
+    font-weight: 400;
+    margin-left: 4px;
+}

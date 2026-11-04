@@ -33,8 +33,8 @@ export class Login {
     this.authService.login(this.form.getRawValue()).subscribe({
       next: () => this.router.navigate(['/']),
       error: (err: HttpErrorResponse) => {
-        this.errorMessage.set(typeof err.error === 'string' ? err.error : 'Unable to login. Please try again later.');
+        this.errorMessage.set(typeof err.error === 'string' ? err.error : 'No se pudo iniciar sesión. Por favor, inténtalo de nuevo más tarde.');
       },
     })
   }
-}
+} 
