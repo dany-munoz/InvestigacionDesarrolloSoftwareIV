@@ -35,6 +35,7 @@ export class SyncService {
     readonly syncing = signal(false);
     readonly message = signal('Sincronización pendiente de iniciar.');
     readonly lastSync = signal<string | null>(null);
+    readonly conflictCount = signal(0);
 
     readonly pendingCount = this.todoItemService.pendingCount;
 
@@ -96,6 +97,7 @@ export class SyncService {
 
         try {
             await this.todoItemService.refreshPendingCount();
+            await this.refreshConflictCount();
 
             this.networkAvailable.set(navigator.onLine);
 
@@ -128,6 +130,12 @@ export class SyncService {
                     continue;
                 }
 
+                // Los pendientes de una tarea en conflicto esperan a que la
+                // persona elija una versión; no bloquean al resto de la cola.
+                if (await this.database.getConflict(currentOperation.todoId)) {
+                    continue;
+                }
+
                 await this.sendOperation(currentOperation);
                 await this.todoItemService.refreshPendingCount();
             }
@@ -137,12 +145,20 @@ export class SyncService {
 
             this.apiAvailable.set(true);
             this.lastSync.set(new Date().toLocaleTimeString());
+            await this.refreshConflictCount();
 
-            this.message.set(
-                this.pendingCount() === 0
-                    ? 'Sincronizado. No quedan cambios pendientes.'
-                    : 'Los cambios nuevos se enviarán en el siguiente ciclo.'
-            );
+            if (this.conflictCount() > 0) {
+                this.message.set(
+                    `Hay ${this.conflictCount()} conflicto(s) por resolver. ` +
+                    'Sus cambios se conservan hasta que elijas una versión.'
+                );
+            } else {
+                this.message.set(
+                    this.pendingCount() === 0
+                        ? 'Sincronizado. No quedan cambios pendientes.'
+                        : 'Los cambios nuevos se enviarán en el siguiente ciclo.'
+                );
+            }
 
             this.completedSubject.next();
         } catch (error: unknown) {
@@ -185,21 +201,40 @@ export class SyncService {
             }
 
             case 'UPDATE': {
-                await firstValueFrom(
-                    this.http.put<void>(
-                        `${this.baseUrl}/${operation.todoId}`,
-                        {
-                            title: item.title,
-                            description: item.description,
-                            isCompleted: item.isCompleted,
-                            completedAt: item.completedAt,
-                        }
-                    ).pipe(timeout(this.requestTimeout))
-                );
+                let serverItem: TodoItem;
+
+                try {
+                    serverItem = await firstValueFrom(
+                        this.http.put<TodoItem>(
+                            `${this.baseUrl}/${operation.todoId}`,
+                            {
+                                title: item.title,
+                                description: item.description,
+                                isCompleted: item.isCompleted,
+                                completedAt: item.completedAt,
+                                version: item.version,
+                            }
+                        ).pipe(timeout(this.requestTimeout))
+                    );
+                } catch (error: unknown) {
+                    // 409: la tarea cambió en el servidor. Se guarda el conflicto
+                    // con ambas versiones y el pendiente se conserva.
+                    if (error instanceof HttpErrorResponse && error.status === 409) {
+                        this.apiAvailable.set(true);
+                        await this.database.saveConflict(
+                            { ...item, id: operation.todoId },
+                            error.error as TodoItem
+                        );
+                        await this.refreshConflictCount();
+                        return;
+                    }
+
+                    throw error;
+                }
 
                 this.apiAvailable.set(true);
 
-                await this.database.confirmPendingOperation(operationId);
+                await this.database.confirmUpdatedItem(operationId, serverItem);
 
                 return;
             }
@@ -209,6 +244,10 @@ export class SyncService {
                     `La sincronización todavía no admite: ${operation.type}`
                 );
         }
+    }
+
+    async refreshConflictCount(): Promise<void> {
+        this.conflictCount.set(await this.database.getConflictCount());
     }
 
     private async receiveRemoteItems(): Promise<void> {

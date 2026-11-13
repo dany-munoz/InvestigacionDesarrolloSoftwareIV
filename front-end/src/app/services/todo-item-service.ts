@@ -1,4 +1,4 @@
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpErrorResponse } from '@angular/common/http';
 import { inject, Injectable, signal } from '@angular/core';
 import { catchError, from, Observable, switchMap, tap } from 'rxjs';
 import { environment } from '../../environments/environment';
@@ -45,7 +45,13 @@ export class TodoItemService {
     }
 
     toggleComplete(id: number): Observable<TodoItem> {
-        return this.http.patch<TodoItem>(`${this.baseUrl}/${id}/toggle`, {});
+        return this.http.patch<TodoItem>(`${this.baseUrl}/${id}/toggle`, {}).pipe(
+            // Guarda la tarea con su nueva versión para que una edición posterior
+            // no se base en una versión vieja.
+            tap(async (updatedItem) => {
+                await this.todoItemDatabase.save(updatedItem);
+            })
+        );
     }
 
     delete(id: number): Observable<void> {
@@ -68,6 +74,7 @@ export class TodoItemService {
                     isCompleted: false,
                     createdAt: new Date().toISOString(),
                     completedAt: null,
+                    version: 0,
                 };
 
                 return from(
@@ -99,40 +106,49 @@ export class TodoItemService {
     }
 
     update(id: number, todo: UpdateTodoItem): Observable<TodoItem> {
-        return this.http.put<void>(`${this.baseUrl}/${id}`, todo).pipe(
-            switchMap(async () => {
-                const existingItem = await this.todoItemDatabase.getById(id);
-                const updatedItem: TodoItem = {
+        return from(this.todoItemDatabase.getById(id)).pipe(
+            switchMap((existingItem) => {
+                // La edición se envía con la versión sobre la que se hizo,
+                // para que el servidor detecte si la tarea cambió en otro lugar.
+                const baseVersion = existingItem?.version ?? 0;
+
+                const buildLocalItem = (): TodoItem => ({
                     id,
                     title: todo.title,
                     description: todo.description,
                     isCompleted: todo.isCompleted,
                     createdAt: existingItem?.createdAt ?? new Date().toISOString(),
                     completedAt: todo.isCompleted ? new Date().toISOString() : null,
-                };
-                await this.todoItemDatabase.save(updatedItem);
-                return updatedItem;
-            }),
-            catchError((error) => {
-                console.warn('No connection, saving task edit to the local queue', error);
+                    version: baseVersion,
+                });
 
-                return from(
-                    (async () => {
-                        const existingItem = await this.todoItemDatabase.getById(id);
-                        const localItem: TodoItem = {
-                            id,
-                            title: todo.title,
-                            description: todo.description,
-                            isCompleted: todo.isCompleted,
-                            createdAt: existingItem?.createdAt ?? new Date().toISOString(),
-                            completedAt: todo.isCompleted ? new Date().toISOString() : null,
-                        };
+                return this.http.put<TodoItem>(`${this.baseUrl}/${id}`, { ...todo, version: baseVersion }).pipe(
+                    switchMap(async (serverItem) => {
+                        await this.todoItemDatabase.save(serverItem);
+                        return serverItem;
+                    }),
+                    catchError((error) => {
+                        const localItem = buildLocalItem();
 
-                        await this.todoItemDatabase.saveWithPending(localItem, 'UPDATE');
-                        await this.refreshPendingCount();
-                        return localItem;
-                    })()
-                )
+                        return from(
+                            (async () => {
+                                await this.todoItemDatabase.saveWithPending(localItem, 'UPDATE');
+
+                                if (error instanceof HttpErrorResponse && error.status === 409) {
+                                    // Conflicto: la edición se conserva como pendiente
+                                    // y se registran ambas versiones para elegir.
+                                    console.warn('Conflict detected, saving both versions.', error);
+                                    await this.todoItemDatabase.saveConflict(localItem, error.error as TodoItem);
+                                } else {
+                                    console.warn('No connection, saving task edit to the local queue', error);
+                                }
+
+                                await this.refreshPendingCount();
+                                return localItem;
+                            })()
+                        );
+                    })
+                );
             })
         );
     }

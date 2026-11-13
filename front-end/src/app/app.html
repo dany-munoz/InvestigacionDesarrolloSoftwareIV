@@ -44,6 +44,18 @@
       </div>
 
       <div>
+        <dt>Conflictos</dt>
+        <dd>
+          @if (sync.conflictCount() > 0) {
+            {{ sync.conflictCount() }} por resolver
+            (<a routerLink="/tasks">ver tareas</a>)
+          } @else {
+            Ninguno
+          }
+        </dd>
+      </div>
+
+      <div>
         <dt>Última sincronización</dt>
         <dd>{{ sync.lastSync() ?? 'Todavía no realizada' }}</dd>
       </div>

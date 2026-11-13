@@ -15,6 +15,10 @@ namespace TodoApi.Models
         public DateTime CreatedAt {get;set;} = DateTime.Now;
         public DateTime? CompletedAt {get; set;}
 
+        // Versión de la tarea: el servidor la incrementa en cada modificación
+        // y la usa para detectar si una edición se hizo sobre una versión vieja.
+        public int Version {get; set;} = 1;
+
         public int? CategoryId {get; set;}
         public Category? Category {get; set;}
     }

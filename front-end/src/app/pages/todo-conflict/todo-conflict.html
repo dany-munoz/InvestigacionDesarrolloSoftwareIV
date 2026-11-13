@@ -1,0 +1,58 @@
+<div class="conflict-wrapper">
+    <div class="conflict-card">
+        <h1 class="page-title">Conflicto en una tarea</h1>
+
+        @if (loading()) {
+        <p class="state-message">Cargando conflicto...</p>
+        } @else if (!conflict()) {
+        <p class="state-message">Esta tarea no tiene conflictos pendientes.</p>
+        <a routerLink="/tasks" class="btn-secondary">Volver a mis tareas</a>
+        } @else {
+        @let c = conflict()!;
+
+        <p class="conflict-explanation">
+            Esta tarea se modificó en otro lugar mientras la editabas. Tu edición se hizo sobre la
+            versión {{ c.localItem.version }}, pero el servidor ya tiene la versión {{ c.serverItem.version }}.
+            Elige qué versión conservar.
+        </p>
+
+        <div class="versions">
+            <section class="version-card">
+                <h2>Tu versión <span class="version-tag">este dispositivo</span></h2>
+                <dl>
+                    <dt>Título</dt>
+                    <dd [class.changed]="differs('title')">{{ c.localItem.title }}</dd>
+                    <dt>Descripción</dt>
+                    <dd [class.changed]="differs('description')">{{ c.localItem.description || '(sin descripción)' }}</dd>
+                    <dt>Estado</dt>
+                    <dd [class.changed]="differs('isCompleted')">{{ c.localItem.isCompleted ? 'Completada' : 'Pendiente' }}</dd>
+                </dl>
+                <button type="button" class="btn-primary" [disabled]="resolving()" (click)="keepLocal()">
+                    Conservar mi versión
+                </button>
+            </section>
+
+            <section class="version-card">
+                <h2>Versión del servidor <span class="version-tag">v{{ c.serverItem.version }}</span></h2>
+                <dl>
+                    <dt>Título</dt>
+                    <dd [class.changed]="differs('title')">{{ c.serverItem.title }}</dd>
+                    <dt>Descripción</dt>
+                    <dd [class.changed]="differs('description')">{{ c.serverItem.description || '(sin descripción)' }}</dd>
+                    <dt>Estado</dt>
+                    <dd [class.changed]="differs('isCompleted')">{{ c.serverItem.isCompleted ? 'Completada' : 'Pendiente' }}</dd>
+                </dl>
+                <button type="button" class="btn-primary" [disabled]="resolving()" (click)="keepServer()">
+                    Conservar la del servidor
+                </button>
+            </section>
+        </div>
+
+        @if (errorMessage()) {
+        <p class="global-error">{{ errorMessage() }}</p>
+        }
+
+        <a routerLink="/tasks" class="btn-secondary">Decidir después</a>
+        }
+    </div>
+</div>

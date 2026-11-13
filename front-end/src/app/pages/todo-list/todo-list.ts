@@ -27,6 +27,8 @@ export class TodoList implements OnInit {
   pendingCount = this.todoItemService.pendingCount;
 
   todos = signal<TodoItem[]>([]);
+  // IDs de las tareas con un conflicto sin resolver.
+  conflictIds = signal<Set<number>>(new Set());
   loading = signal(true);
   errorMessage = signal('');
 
@@ -55,10 +57,18 @@ export class TodoList implements OnInit {
         this.todos.set(todos);
         this.loading.set(false);
         this.errorMessage.set('');
+        void this.loadConflicts();
       });
   }
 
+  private async loadConflicts(): Promise<void> {
+    const conflicts = await this.todoItemDatabase.getConflicts();
+    this.conflictIds.set(new Set(conflicts.map((conflict) => conflict.todoId)));
+  }
+
   ngOnInit(): void {
+    void this.loadConflicts();
+
     this.todoItemService.getAll().subscribe({
       next: async (todos) => {
         this.todos.set(todos);

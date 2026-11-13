@@ -1,0 +1,138 @@
+.conflict-wrapper {
+    display: flex;
+    justify-content: center;
+    padding: 2rem 1rem;
+    font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+}
+
+.conflict-card {
+    background: #ffffff;
+    padding: 2rem;
+    border-radius: 12px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+    border: 1px solid #eaeaea;
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    gap: 1.25rem;
+}
+
+.page-title {
+    font-size: 1.6rem;
+    color: #1a1a2e;
+    margin: 0;
+    font-weight: 800;
+    text-align: center;
+}
+
+.conflict-explanation,
+.state-message {
+    margin: 0;
+    color: #55546b;
+    line-height: 1.5;
+    text-align: center;
+}
+
+.versions {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 1rem;
+}
+
+@media (max-width: 600px) {
+    .versions {
+        grid-template-columns: 1fr;
+    }
+}
+
+.version-card {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    padding: 1rem;
+    border: 1px solid #e0dff0;
+    border-radius: 8px;
+}
+
+.version-card h2 {
+    margin: 0;
+    font-size: 1.05rem;
+    color: #1a1a2e;
+}
+
+.version-tag {
+    margin-left: 0.4rem;
+    padding: 0.1rem 0.5rem;
+    border-radius: 999px;
+    background: #efedff;
+    color: #362697;
+    font-size: 0.75rem;
+    font-weight: 600;
+}
+
+.version-card dl {
+    margin: 0;
+    flex: 1;
+}
+
+.version-card dt {
+    color: #55546b;
+    font-size: 0.85rem;
+}
+
+.version-card dd {
+    margin: 0 0 0.75rem;
+    padding: 0.2rem 0.4rem;
+    border-radius: 4px;
+    overflow-wrap: anywhere;
+}
+
+/* Campos que difieren entre ambas versiones */
+.version-card dd.changed {
+    background: #fff3cd;
+    font-weight: 600;
+}
+
+.btn-primary {
+    background-color: #4b38d3;
+    color: white;
+    padding: 0.8rem;
+    border-radius: 6px;
+    font-weight: 600;
+    font-size: 0.95rem;
+    border: none;
+    cursor: pointer;
+}
+
+.btn-primary:hover:not(:disabled) {
+    background-color: #3a2bb3;
+}
+
+.btn-primary:disabled {
+    background-color: #a097d6;
+    cursor: not-allowed;
+}
+
+.btn-secondary {
+    color: #6c757d;
+    padding: 0.8rem;
+    border-radius: 6px;
+    font-weight: 600;
+    border: 1px solid #d1d5db;
+    text-decoration: none;
+    text-align: center;
+}
+
+.btn-secondary:hover {
+    background-color: #f8f9fa;
+    color: #1a1a2e;
+}
+
+.global-error {
+    color: #d32f2f;
+    text-align: center;
+    background-color: #fdeaea;
+    padding: 0.8rem;
+    border-radius: 6px;
+    margin: 0;
+}

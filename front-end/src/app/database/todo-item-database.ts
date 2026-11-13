@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core';
 import Dexie, { Table } from 'dexie';
 import { PendingOperation } from '../models/pending-operation.model';
+import { TodoConflict } from '../models/todo-conflict.model';
 import { TodoItem } from '../models/todo-item.model';
 
 @Injectable({
@@ -9,6 +10,7 @@ import { TodoItem } from '../models/todo-item.model';
 export class TodoItemDatabase extends Dexie {
     todoItems!: Table<TodoItem, number>;
     pendingOperations!: Table<PendingOperation, number>;
+    conflicts!: Table<TodoConflict, number>;
 
     constructor() {
         super('TaskManagerDB');
@@ -16,6 +18,13 @@ export class TodoItemDatabase extends Dexie {
         this.version(2).stores({
             todoItems: 'id, syncStatus',
             pendingOperations: '++id, todoId, type'
+        });
+
+        // Versión 3: tabla de conflictos (una entrada por tarea en conflicto).
+        this.version(3).stores({
+            todoItems: 'id, syncStatus',
+            pendingOperations: '++id, todoId, type',
+            conflicts: 'todoId'
         });
     }
 
@@ -91,6 +100,7 @@ export class TodoItemDatabase extends Dexie {
                 await this.todoItems.put({
                     ...(localItem ?? serverItem),
                     id: serverItem.id,
+                    version: serverItem.version,
                 });
 
                 if (temporaryId !== serverItem.id) {
@@ -107,6 +117,7 @@ export class TodoItemDatabase extends Dexie {
                         pending.payload = {
                             ...pending.payload,
                             id: serverItem.id,
+                            version: serverItem.version,
                         };
                     });
             }
@@ -115,6 +126,123 @@ export class TodoItemDatabase extends Dexie {
 
     async confirmPendingOperation(operationId: number): Promise<void> {
         await this.pendingOperations.delete(operationId);
+    }
+
+    // Confirma una edición aceptada por el servidor y propaga la nueva versión
+    // a los demás pendientes de la misma tarea, para que no generen un conflicto
+    // falso al enviarse con la versión anterior.
+    async confirmUpdatedItem(
+        operationId: number,
+        serverItem: TodoItem
+    ): Promise<void> {
+        await this.transaction(
+            'rw',
+            this.todoItems,
+            this.pendingOperations,
+            async () => {
+                await this.pendingOperations.delete(operationId);
+
+                const remaining = await this.pendingOperations
+                    .where('todoId')
+                    .equals(serverItem.id)
+                    .count();
+
+                if (remaining === 0) {
+                    await this.todoItems.put(serverItem);
+                    return;
+                }
+
+                await this.pendingOperations
+                    .where('todoId')
+                    .equals(serverItem.id)
+                    .modify((pending) => {
+                        pending.payload = {
+                            ...pending.payload,
+                            version: serverItem.version,
+                        };
+                    });
+
+                await this.todoItems.update(serverItem.id, {
+                    version: serverItem.version,
+                });
+            }
+        );
+    }
+
+    // ----- Conflictos -----
+
+    async saveConflict(localItem: TodoItem, serverItem: TodoItem): Promise<void> {
+        await this.conflicts.put({
+            todoId: localItem.id,
+            localItem,
+            serverItem,
+            detectedAt: new Date().toISOString(),
+        });
+    }
+
+    async getConflicts(): Promise<TodoConflict[]> {
+        return await this.conflicts.toArray();
+    }
+
+    async getConflict(todoId: number): Promise<TodoConflict | undefined> {
+        return await this.conflicts.get(todoId);
+    }
+
+    async getConflictCount(): Promise<number> {
+        return await this.conflicts.count();
+    }
+
+    // "Conservar mi versión": los pendientes de la tarea pasan a basarse en la
+    // versión actual del servidor y se reenviarán en la siguiente sincronización.
+    async keepLocalVersion(todoId: number): Promise<void> {
+        await this.transaction(
+            'rw',
+            this.todoItems,
+            this.pendingOperations,
+            this.conflicts,
+            async () => {
+                const conflict = await this.conflicts.get(todoId);
+                if (!conflict) {
+                    return;
+                }
+
+                const serverVersion = conflict.serverItem.version;
+
+                await this.pendingOperations
+                    .where('todoId')
+                    .equals(todoId)
+                    .modify((pending) => {
+                        pending.payload = {
+                            ...pending.payload,
+                            version: serverVersion,
+                        };
+                    });
+
+                await this.todoItems.update(todoId, { version: serverVersion });
+                await this.conflicts.delete(todoId);
+            }
+        );
+    }
+
+    // "Conservar la versión del servidor": se guarda la versión del servidor y
+    // se descartan los pendientes locales de esa tarea.
+    async keepServerVersion(todoId: number): Promise<void> {
+        await this.transaction(
+            'rw',
+            this.todoItems,
+            this.pendingOperations,
+            this.conflicts,
+            async () => {
+                const conflict = await this.conflicts.get(todoId);
+                if (!conflict) {
+                    return;
+                }
+
+                await this.todoItems.put(conflict.serverItem);
+                await this.pendingOperations.where('todoId').equals(todoId).delete();
+                await this.conflicts.delete(todoId);
+            }
+        );
     }
 
     async saveRemoteItems(serverItems: TodoItem[]): Promise<void> {

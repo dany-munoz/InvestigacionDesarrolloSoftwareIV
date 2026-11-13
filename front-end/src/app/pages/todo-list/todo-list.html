@@ -30,7 +30,7 @@
             } @else {
             <ul class="todo-list">
                 @for (todo of todos(); track todo.id) {
-                <li class="todo-item" [class.completed]="todo.isCompleted">
+                <li class="todo-item" [class.completed]="todo.isCompleted" [class.in-conflict]="conflictIds().has(todo.id)">
                     <label class="todo-check">
                         <input type="checkbox" [checked]="todo.isCompleted" (change)="onToggle(todo)"
                             class="checkbox-input" />
@@ -38,6 +38,9 @@
                     </label>
 
                     <div class="todo-actions">
+                        @if (conflictIds().has(todo.id)) {
+                        <a [routerLink]="['/tasks', todo.id, 'conflict']" class="btn-conflict">Resolver conflicto</a>
+                        }
                         <a [routerLink]="['/tasks', todo.id, 'edit']" class="btn-edit">Editar</a>
                         <button type="button" class="delete-button" (click)="onDelete(todo)">Eliminar</button>
                     </div>

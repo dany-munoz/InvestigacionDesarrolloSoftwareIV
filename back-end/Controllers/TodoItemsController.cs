@@ -74,10 +74,18 @@ namespace TodoApi.Controllers
         // }
 
         [HttpPut("{id:int}")]
-        public async Task<ActionResult> UpdateTodoItem(int id, TodoItem updated)
+        public async Task<ActionResult<TodoItem>> UpdateTodoItem(int id, TodoItem updated)
         {
             var todoItem = await _context.TodoItems.FindAsync(id);
             if (todoItem == null) return NotFound();
+
+            // Detección de conflictos: la edición debe hacerse sobre la versión actual.
+            // Si otro lugar ya modificó la tarea, se responde 409 con la tarea actual
+            // para que el cliente muestre ambas versiones.
+            if (updated.Version != todoItem.Version)
+            {
+                return Conflict(todoItem);
+            }
 
             if (todoItem.CategoryId.HasValue)
             {
@@ -89,9 +97,10 @@ namespace TodoApi.Controllers
             todoItem.Description = updated.Description;
             todoItem.IsCompleted = updated.IsCompleted;
             todoItem.CompletedAt = updated.IsCompleted && todoItem.CompletedAt == null ? DateTime.Now : updated.CompletedAt;
+            todoItem.Version++;
 
             await _context.SaveChangesAsync();
-            return NoContent();
+            return Ok(todoItem);
         }
 
         [HttpPatch("{id:int}/toggle")]
@@ -102,6 +111,7 @@ namespace TodoApi.Controllers
 
             todoItem.IsCompleted = !todoItem.IsCompleted;
             todoItem.CompletedAt = todoItem.IsCompleted ? DateTime.Now : null;
+            todoItem.Version++;
 
             await _context.SaveChangesAsync();
             return Ok(todoItem);

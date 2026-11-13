@@ -3,6 +3,7 @@ import { Home } from './home/home';
 import { Login } from './pages/login/login';
 import { TodoList } from './pages/todo-list/todo-list';
 import { TodoForm } from './pages/todo-form/todo-form';
+import { TodoConflictPage } from './pages/todo-conflict/todo-conflict';
 
 export const routes: Routes = [
   { path: '', component: Home },
@@ -10,4 +11,5 @@ export const routes: Routes = [
   { path: 'tasks', component: TodoList },
   { path: 'tasks/new', component: TodoForm },
   { path: 'tasks/:id/edit', component: TodoForm },
+  { path: 'tasks/:id/conflict', component: TodoConflictPage },
 ];

@@ -5,4 +5,5 @@ export interface TodoItem {
     isCompleted: boolean;
     createdAt: string;
     completedAt: string | null;
+    version: number;
 }

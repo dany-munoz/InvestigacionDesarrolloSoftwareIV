@@ -212,3 +212,23 @@
     color: #1a1a2e;
     border-color: #9ca3af;
 }
+/* Tarea con un conflicto sin resolver */
+.todo-item.in-conflict {
+    border-left: 4px solid #e0a800;
+    background-color: #fffaf0;
+}
+
+.btn-conflict {
+    color: #856404;
+    background-color: #fff3cd;
+    border: 1px solid #ffeeba;
+    padding: 0.4rem 0.8rem;
+    border-radius: 6px;
+    font-size: 0.85rem;
+    font-weight: 600;
+    text-decoration: none;
+}
+
+.btn-conflict:hover {
+    background-color: #ffe8a1;
+}
