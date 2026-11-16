@@ -1,6 +1,6 @@
 import { HttpClient, HttpErrorResponse } from '@angular/common/http';
 import { inject, Injectable, signal } from '@angular/core';
-import { catchError, from, Observable, switchMap, tap } from 'rxjs';
+import { catchError, from, Observable, switchMap, tap, throwError } from 'rxjs';
 import { environment } from '../../environments/environment';
 import { TodoItemDatabase } from '../database/todo-item-database';
 import { NewTodoItem } from '../models/new-todo-item.model';
@@ -19,6 +19,16 @@ export class TodoItemService {
 
     constructor() {
         this.refreshPendingCount();
+    }
+
+    private isNetworkError(error: unknown): boolean {
+        if(!navigator.onLine) {
+            return true;
+        }
+        if (error instanceof HttpErrorResponse) {
+            return error.status === 0 || error.status === 503 || error.status === 504;
+        }
+        return false;
     }
 
     async refreshPendingCount(): Promise<void> {
@@ -64,6 +74,11 @@ export class TodoItemService {
                 await this.todoItemDatabase.save(createdItem);
             }),
             catchError((error) => {
+
+                if(!this.isNetworkError(error)){
+                    return throwError(() => error);
+                }
+
                 console.warn('No connection, saving task creation to the local queue.', error);
 
                 const tempId = -Math.floor(Math.random() * 100000);
@@ -128,13 +143,19 @@ export class TodoItemService {
                         return serverItem;
                     }),
                     catchError((error) => {
+                        const isConflict = error instanceof HttpErrorResponse && error.status === 409;
+
+                        if (!this.isNetworkError(error) && !isConflict) {
+                            return throwError(() => error);
+                        }
+
                         const localItem = buildLocalItem();
 
                         return from(
                             (async () => {
                                 await this.todoItemDatabase.saveWithPending(localItem, 'UPDATE');
 
-                                if (error instanceof HttpErrorResponse && error.status === 409) {
+                                if (isConflict) {
                                     // Conflicto: la edición se conserva como pendiente
                                     // y se registran ambas versiones para elegir.
                                     console.warn('Conflict detected, saving both versions.', error);
