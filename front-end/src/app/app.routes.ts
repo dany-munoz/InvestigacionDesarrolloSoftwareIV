@@ -8,6 +8,7 @@ import { TodoConflictPage } from './pages/todo-conflict/todo-conflict';
 export const routes: Routes = [
   { path: '', component: Home },
   { path: 'login', component: Login},
+  { path: 'register', component: Login},
   { path: 'tasks', component: TodoList },
   { path: 'tasks/new', component: TodoForm },
   { path: 'tasks/:id/edit', component: TodoForm },

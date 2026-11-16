@@ -19,6 +19,10 @@ export class Auth {
 
     private readonly todoItemDatabase = inject(TodoItemDatabase);
 
+    register(credentials: Credentials): Observable<AuthResponse> {
+        return this.http.post<AuthResponse>(`${environment.apiUrl}/auth/register`, credentials);
+    }
+
     login(credentials: Credentials): Observable<AuthResponse> {
         return this.http.post<AuthResponse>(`${environment.apiUrl}/auth/login`, credentials).pipe(
             tap((response) => this.setToken(response.token))
