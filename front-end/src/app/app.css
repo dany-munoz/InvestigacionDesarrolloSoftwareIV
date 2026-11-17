@@ -1,97 +1,233 @@
+/* ---------- Encabezado ---------- */
 .app-header {
   display: flex;
   align-items: center;
-  padding: 0.9rem 1.5rem;
-  background: var(--surface);
-  border-bottom: 1px solid var(--line);
+  max-width: 760px;
+  margin: 0 auto;
+  padding: 1.25rem 1.25rem 0;
 }
 
 .app-title {
-  font-weight: 700;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.6rem;
+  color: var(--ink);
   font-size: 1.1rem;
-  color: var(--accent-ink);
+  font-weight: 800;
+  letter-spacing: -0.02em;
 }
 
+/* Marca: un cuadro con una palomita, dibujado con CSS. */
+.app-title::before {
+  content: '';
+  width: 1.6rem;
+  height: 1.6rem;
+  border-radius: 7px;
+  background:
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='white' stroke-width='3' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M5 12.5l4.5 4.5L19 7.5'/%3E%3C/svg%3E")
+      center / 70% no-repeat,
+    var(--accent);
+}
+
+/* ---------- Contenido ---------- */
 .app-main {
-  max-width: 720px;
+  max-width: 760px;
   margin: 0 auto;
-  padding: 2rem 1.5rem;
+  /* Deja espacio para la barra de sincronización fija. */
+  padding: 1.5rem 1.25rem 7rem;
+}
+
+/* ---------- Barra de sincronización ---------- */
+.sync-dock {
+  position: fixed;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  z-index: 20;
+  display: flex;
+  justify-content: center;
+  padding: 0 0.75rem;
+  pointer-events: none;
 }
 
 .sync-panel {
-  margin-bottom: 2rem;
-  padding: 1rem;
-  border: 1px solid var(--line);
-  border-radius: 0.75rem;
-  background: var(--surface);
-  color: var(--ink);
+  --lamp: var(--ok);
+  width: 100%;
+  max-width: 760px;
+  border-radius: var(--radius-lg) var(--radius-lg) 0 0;
+  background: var(--dock);
+  color: #e6ebf2;
+  box-shadow: 0 -10px 30px -12px rgba(22, 32, 46, 0.45);
+  pointer-events: auto;
 }
 
-.sync-panel-heading {
+.sync-panel.has-pending,
+.sync-panel.is-syncing {
+  --lamp: #f2a93b;
+}
+
+.sync-panel.has-conflicts,
+.sync-panel.is-offline {
+  --lamp: #ef5b5b;
+}
+
+.sync-summary {
   display: flex;
   align-items: center;
-  justify-content: space-between;
-  flex-wrap: wrap;
   gap: 0.75rem;
+  padding: 0.85rem 1.1rem;
+  cursor: pointer;
+  list-style: none;
+  user-select: none;
 }
 
-.sync-panel-heading h2 {
-  margin: 0;
-  font-size: 1rem;
+.sync-summary::-webkit-details-marker {
+  display: none;
+}
+
+.sync-summary:focus-visible {
+  outline: 3px solid var(--lamp);
+  outline-offset: -3px;
+  border-radius: var(--radius-lg) var(--radius-lg) 0 0;
+}
+
+.sync-lamp {
+  flex: none;
+  width: 0.7rem;
+  height: 0.7rem;
+  border-radius: 50%;
+  background: var(--lamp);
+  box-shadow: 0 0 0 4px color-mix(in srgb, var(--lamp) 25%, transparent);
+}
+
+.sync-panel.is-syncing .sync-lamp {
+  animation: sync-pulse 1s ease-in-out infinite;
+}
+
+@keyframes sync-pulse {
+  50% {
+    box-shadow: 0 0 0 7px color-mix(in srgb, var(--lamp) 10%, transparent);
+  }
+}
+
+.sync-summary-title {
+  font-weight: 700;
+}
+
+.sync-summary-state {
+  color: #a9b5c6;
+  font-size: 0.92rem;
+}
+
+.sync-summary-toggle {
+  width: 0.55rem;
+  height: 0.55rem;
+  margin-left: auto;
+  border-top: 2px solid #a9b5c6;
+  border-left: 2px solid #a9b5c6;
+  transform: translateY(2px) rotate(45deg);
+  transition: transform 0.2s ease;
+}
+
+.sync-panel[open] .sync-summary-toggle {
+  transform: translateY(-2px) rotate(225deg);
+}
+
+.sync-body {
+  padding: 0 1.1rem 1.1rem;
+  border-top: 1px solid #2b3a50;
 }
 
 .sync-details {
   display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
+  grid-template-columns: repeat(5, minmax(0, 1fr));
   gap: 1rem;
   margin: 1rem 0;
 }
 
 .sync-details dt {
-  margin-bottom: 0.25rem;
-  color: var(--ink-soft);
-  font-size: 0.85rem;
+  margin-bottom: 0.2rem;
+  color: #8e9bb0;
+  font-size: 0.78rem;
 }
 
 .sync-details dd {
   margin: 0;
   font-weight: 600;
+  font-size: 0.95rem;
   overflow-wrap: anywhere;
+}
+
+.sync-details a {
+  color: #8fd3b9;
+}
+
+.sync-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  padding-top: 0.9rem;
+  border-top: 1px solid #2b3a50;
 }
 
 .sync-message {
   margin: 0;
-  padding-top: 0.75rem;
-  border-top: 1px solid var(--line);
-  line-height: 1.5;
+  color: #c9d2de;
+  font-size: 0.9rem;
+  line-height: 1.45;
 }
 
 .sync-button {
-  padding: 0.5rem 0.75rem;
-  border: 1px solid var(--accent);
-  border-radius: 0.4rem;
-  background: var(--accent);
-  color: #fff;
+  flex: none;
+  padding: 0.55rem 1rem;
+  border: 1px solid #e6ebf2;
+  border-radius: var(--radius);
+  background: #e6ebf2;
+  color: var(--dock);
   font: inherit;
+  font-size: 0.9rem;
+  font-weight: 600;
   cursor: pointer;
 }
 
 .sync-button:hover:not(:disabled) {
-  background: var(--accent-ink);
+  background: #ffffff;
 }
 
 .sync-button:focus-visible {
-  outline: 2px solid var(--accent);
-  outline-offset: 3px;
+  outline: 3px solid var(--lamp);
+  outline-offset: 2px;
 }
 
 .sync-button:disabled {
-  opacity: 0.6;
+  opacity: 0.45;
   cursor: not-allowed;
 }
 
-@media (max-width: 480px) {
+@media (max-width: 640px) {
+  .sync-dock {
+    padding: 0;
+  }
+
   .sync-details {
-    grid-template-columns: 1fr;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .sync-footer {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .sync-summary-state {
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .sync-panel.is-syncing .sync-lamp {
+    animation: none;
   }
 }
