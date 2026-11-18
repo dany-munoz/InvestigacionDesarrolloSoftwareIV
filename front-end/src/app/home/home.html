@@ -1,20 +1,24 @@
 <div class="home-wrapper">
-    <div class="home-card">
-        <h1 class="logo-text">TodoApp</h1>
+    <section class="home-card" aria-labelledby="home-title">
+        <span class="brand-mark" aria-hidden="true"></span>
+        <h1 id="home-title" class="logo-text">TodoApp</h1>
 
         <div class="content-container">
             @if (authService.isLoggedIn()) {
             <p class="status-text success">¡Bienvenido de vuelta!</p>
+            <p class="status-hint">Tus tareas te esperan, también sin conexión.</p>
             <div class="action-group">
                 <a routerLink="/tasks" class="btn-primary">Ver mis tareas</a>
-                <button (click)="authService.logout()" class="btn-secondary">Cerrar sesión</button>
+                <button type="button" (click)="authService.logout()" class="btn-secondary">Cerrar sesión</button>
             </div>
             } @else {
             <p class="status-text">Aún no has iniciado sesión.</p>
+            <p class="status-hint">Inicia sesión para ver y organizar tus tareas.</p>
             <div class="action-group">
                 <a routerLink="/login" class="btn-primary">Iniciar sesión</a>
+                <a routerLink="/register" class="btn-secondary">Crear cuenta</a>
             </div>
             }
         </div>
-    </div>
+    </section>
 </div>

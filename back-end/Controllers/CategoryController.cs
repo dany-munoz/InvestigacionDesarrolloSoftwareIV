@@ -74,7 +74,7 @@ namespace TodoApi.Controllers
 
             var hasAssociatedTodos = await _context.TodoItems.AnyAsync(T => T.CategoryId == id);
 
-            if (hasAssociatedTodos) return Conflict("Cannot delete category because it has associated todo items");
+            if (hasAssociatedTodos) return Conflict("No se puede eliminar la categoría porque tiene tareas asociadas");
 
             _context.Categories.Remove(category);
 

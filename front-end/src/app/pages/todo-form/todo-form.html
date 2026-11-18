@@ -1,6 +1,6 @@
 <div class="form-wrapper">
     <div class="form-card">
-        <h1 class="page-title">{{ editingId ? 'Edit Task' : 'Create Task' }}</h1>
+        <h1 class="page-title">{{ editingId ? 'Editar tarea' : 'Nueva tarea' }}</h1>
 
         @if (pendingCount() > 0) {
         <div class="alert alert-warning">
@@ -11,17 +11,17 @@
         <form [formGroup]="form" (ngSubmit)="onSubmit()" class="todo-form">
 
             <div class="form-group">
-                <label for="title">Titulo</label>
+                <label for="title">Título</label>
                 <input id="title" type="text" formControlName="title" autocomplete="title" class="form-control"
-                    placeholder="Titulo de la tarea..." />
+                    placeholder="Título de la tarea..." />
 
                 @if (form.controls.title.invalid && form.controls.title.touched) {
-                <p class="field-error">El titulo es requerido</p>
+                <p class="field-error">El título es requerido</p>
                 }
             </div>
 
             <div class="form-group">
-                <label for="description">Descripción <span class="text-muted">(Opcional)</span></label>
+                <label for="description">Descripción <span class="text-muted">(opcional)</span></label>
                 <input id="description" type="text" formControlName="description" autocomplete="description"
                     class="form-control" placeholder="Detalles de la tarea..." />
             </div>
@@ -32,7 +32,7 @@
 
             <div class="action-group">
                 <button type="submit" class="btn-primary" [disabled]="form.invalid">
-                    {{ editingId ? 'Actualizar Tarea' : 'Crear Tarea' }}
+                    {{ editingId ? 'Guardar cambios' : 'Crear tarea' }}
                 </button>
                 <a routerLink="/tasks" class="btn-secondary">Cancelar</a>
             </div>

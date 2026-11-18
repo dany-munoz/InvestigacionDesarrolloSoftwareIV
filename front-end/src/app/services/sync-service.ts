@@ -150,7 +150,7 @@ export class SyncService {
             if (this.conflictCount() > 0) {
                 this.message.set(
                     `Hay ${this.conflictCount()} conflicto(s) por resolver. ` +
-                    'Sus cambios se conservan hasta que elijas una versión.'
+                    'Tus cambios se conservan hasta que elijas una versión.'
                 );
             } else {
                 this.message.set(

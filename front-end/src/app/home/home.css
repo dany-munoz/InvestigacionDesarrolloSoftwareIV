@@ -1,37 +1,71 @@
+/* Portada: un solo panel centrado con el mismo fondo y tono
+   que la lista de tareas (superficie blanca, borde suave y sombra). */
 .home-wrapper {
-    padding: clamp(2rem, 8vh, 5rem) 0 2rem;
+    display: grid;
+    place-items: center;
+    min-height: calc(100vh - 9rem);
 }
 
 .home-card {
-    max-width: 34rem;
+    width: 100%;
+    max-width: 30rem;
+    padding: clamp(2rem, 6vw, 3rem) clamp(1.5rem, 5vw, 2.75rem);
+    border: 1px solid var(--line);
+    border-top: 4px solid var(--accent);
+    border-radius: var(--radius-lg);
+    background: var(--surface);
+    box-shadow: var(--shadow);
+    text-align: center;
+}
+
+/* Marca: el mismo cuadro con palomita del encabezado, en grande. */
+.brand-mark {
+    display: block;
+    width: 3.5rem;
+    height: 3.5rem;
+    margin: 0 auto 1.25rem;
+    border-radius: 14px;
+    background:
+        url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='white' stroke-width='3' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M5 12.5l4.5 4.5L19 7.5'/%3E%3C/svg%3E")
+            center / 68% no-repeat,
+        var(--accent);
 }
 
 .logo-text {
     margin: 0;
     color: var(--ink);
-    font-size: clamp(2.6rem, 8vw, 4rem);
+    font-size: clamp(2.4rem, 8vw, 3.4rem);
     font-weight: 800;
     letter-spacing: -0.045em;
     line-height: 1;
 }
 
 .content-container {
-    margin-top: 1.25rem;
+    margin-top: 1.5rem;
 }
 
 .status-text {
-    margin: 0 0 2rem;
-    color: var(--ink-soft);
-    font-size: 1.15rem;
+    margin: 0;
+    color: var(--ink);
+    font-size: 1.2rem;
+    font-weight: 600;
 }
 
-.status-text.success {
-    color: var(--ink);
-    font-weight: 500;
+.status-hint {
+    margin: 0.35rem 0 1.75rem;
+    color: var(--ink-soft);
+    font-size: 0.98rem;
 }
 
 .action-group {
     display: flex;
     flex-wrap: wrap;
+    justify-content: center;
     gap: 0.75rem;
+}
+
+@media (max-width: 420px) {
+    .action-group > * {
+        flex: 1 1 100%;
+    }
 }

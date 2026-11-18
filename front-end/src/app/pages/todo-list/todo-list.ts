@@ -1,5 +1,5 @@
 import { Component, OnInit, inject, signal } from '@angular/core';
-import { RouterLink } from '@angular/router';
+import { Router, RouterLink } from '@angular/router';
 import Swal from 'sweetalert2';
 import { TodoItem } from '../../models/todo-item.model';
 import { Auth } from '../../services/auth';
@@ -18,7 +18,8 @@ import { SyncService } from '../../services/sync-service';
 })
 
 export class TodoList implements OnInit {
-  private readonly authService = inject(Auth);
+  protected readonly authService = inject(Auth);
+  private readonly router = inject(Router);
   private readonly todoItemService = inject(TodoItemService);
   private readonly syncService = inject(SyncService);
   private readonly todoItemDatabase = inject(TodoItemDatabase);
@@ -93,27 +94,46 @@ export class TodoList implements OnInit {
       next: (updated) =>
         this.todos.update((current) => current.map((t) => (t.id === updated.id ? updated : t))),
       error: () => Swal.fire({
-        icon: "error",
-        title: "Error",
-        text: "No se pudo actualizar la tarea.",
+        icon: 'error',
+        iconColor: 'var(--danger)',
+        title: 'No se pudo actualizar la tarea',
+        text: 'Revisa tu conexión e inténtalo de nuevo.',
         showConfirmButton: false,
+        customClass: {
+          popup: 'app-dialog',
+          title: 'app-dialog-title',
+          htmlContainer: 'app-dialog-text',
+        },
       }),
     });
   }
 
+  // Cierra la sesión y regresa de inmediato a la portada.
+  onLogout(): void {
+    this.authService.logout();
+    void this.router.navigate(['/']);
+  }
+
   onDelete(todo: TodoItem): void {
-    // const confirmed = confirm(`Delete "${todo.title}"?`);
-    // if (!confirmed) {
-    //   return;
-    // }
     Swal.fire({
-      title: "Are you sure?",
-      text: "You won't be able to revert this!",
-      icon: "warning",
+      title: '¿Eliminar esta tarea?',
+      text: `“${todo.title}” se eliminará y no podrás recuperarla.`,
+      icon: 'warning',
+      iconColor: 'var(--warn)',
       showCancelButton: true,
-      confirmButtonColor: "#3085d6",
-      cancelButtonColor: "#d33",
-      confirmButtonText: "Delete"
+      confirmButtonText: 'Eliminar',
+      cancelButtonText: 'Cancelar',
+      reverseButtons: true,
+      focusCancel: true,
+      buttonsStyling: false,
+      customClass: {
+        popup: 'app-dialog',
+        title: 'app-dialog-title',
+        htmlContainer: 'app-dialog-text',
+        actions: 'app-dialog-actions',
+        confirmButton: 'btn-primary',
+        cancelButton: 'btn-secondary',
+      },
     }).then((result) => {
       if (!result.isConfirmed)
         return;

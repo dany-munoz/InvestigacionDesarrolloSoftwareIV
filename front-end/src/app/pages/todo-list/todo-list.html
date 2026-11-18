@@ -2,8 +2,8 @@
     <div class="list-card">
 
         <div class="header-section">
-            <h1 class="page-title">Mis Tareas</h1>
-            <a routerLink="/tasks/new" class="btn-primary">+ Nueva Tarea</a>
+            <h1 class="page-title">Mis tareas</h1>
+            <a routerLink="/tasks/new" class="btn-primary">+ Nueva tarea</a>
         </div>
 
         @if (pendingCount() > 0) {
@@ -52,7 +52,7 @@
 
         <div class="footer-section">
             @if (authService.isLoggedIn()) {
-            <button (click)="authService.logout()" class="btn-secondary">Cerrar sesión</button>
+            <button type="button" (click)="onLogout()" class="btn-secondary">Cerrar sesión</button>
             } @else {
             <a routerLink="/" class="btn-secondary">Volver al inicio</a>
             }

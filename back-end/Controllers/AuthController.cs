@@ -27,10 +27,10 @@ namespace TodoApi.Controllers
         public async Task<ActionResult> Login(Credentials credentials)
         {
             var user = await _userManager.FindByNameAsync(credentials.Username);
-            if (user == null) return Unauthorized("Invalid Username or Password");
+            if (user == null) return Unauthorized("Usuario o contraseña incorrectos");
 
             var passwordValid = await _userManager.CheckPasswordAsync(user, credentials.Password);
-            if (!passwordValid) return Unauthorized("Invalid Username or Password");
+            if (!passwordValid) return Unauthorized("Usuario o contraseña incorrectos");
 
             var jwtSettings = _configuration.GetSection("Jwt");
             var signingKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtSettings["Key"]!));
@@ -67,7 +67,7 @@ namespace TodoApi.Controllers
                 return BadRequest(result.Errors.Select(e => e.Description));
             }
 
-            return StatusCode(StatusCodes.Status201Created, new {message = "User created succesfully"});
+            return StatusCode(StatusCodes.Status201Created, new {message = "Usuario creado correctamente"});
         }
     }
 }

@@ -36,7 +36,7 @@ namespace TodoApi.Controllers
             if (todoItem.CategoryId.HasValue)
             {
                 var categoryExists = await _context.Categories.AnyAsync(t => t.Id == todoItem.CategoryId);
-                if (!categoryExists) return BadRequest("The specified category does not exists");
+                if (!categoryExists) return BadRequest("La categoría indicada no existe");
             }
 
             _context.TodoItems.Add(todoItem);
@@ -90,7 +90,7 @@ namespace TodoApi.Controllers
             if (todoItem.CategoryId.HasValue)
             {
                 var categoryExists = await _context.Categories.AnyAsync(t => t.Id == todoItem.CategoryId);
-                if (!categoryExists) return BadRequest("The specified category does not exists");
+                if (!categoryExists) return BadRequest("La categoría indicada no existe");
             } 
 
             todoItem.Title = updated.Title;
