@@ -20,7 +20,7 @@ import { SyncService } from '../../services/sync-service';
 export class TodoList implements OnInit {
   private readonly authService = inject(Auth);
   private readonly todoItemService = inject(TodoItemService);
-    private readonly syncService = inject(SyncService);
+  private readonly syncService = inject(SyncService);
   private readonly todoItemDatabase = inject(TodoItemDatabase);
   private readonly destroyRef = inject(DestroyRef);
 
@@ -70,15 +70,9 @@ export class TodoList implements OnInit {
     void this.loadConflicts();
 
     this.todoItemService.getAll().subscribe({
-      next: async (todos) => {
+      next: (todos) => {
         this.todos.set(todos);
-        this.loading.set(false);
-        
-        try {
-          await this.todoItemDatabase.todoItems.bulkPut(todos);
-        } catch (error) {
-          console.error("Error guardando en la base de datos local:", error);
-        }
+        this.loading.set(false); 
       },
       error: async () => {
         try {

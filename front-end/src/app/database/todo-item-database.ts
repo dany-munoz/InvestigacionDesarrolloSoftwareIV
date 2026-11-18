@@ -48,6 +48,9 @@ export class TodoItemDatabase extends Dexie {
         await this.todoItems.put(item);
     }
 
+    async deleteItem(id: number): Promise<void> {
+        await this.todoItems.delete(id);
+    }
 
     async saveWithPending(item: TodoItem, operationType: 'CREATE' | 'UPDATE'): Promise<void> {
         await this.transaction('rw', this.todoItems, this.pendingOperations, async () => {
@@ -256,6 +259,16 @@ export class TodoItemDatabase extends Dexie {
                 const protectedIds = new Set(
                     pendingOperations.map(operation => operation.todoId)
                 );
+
+                const serverIds = new Set(serverItems.map(item => item.id));
+                const localItems = await this.todoItems.toArray();
+                const idsToDelete = localItems
+                    .filter(local => !serverIds.has(local.id) && !protectedIds.has(local.id))
+                    .map(local => local.id);
+
+                if(idsToDelete.length > 0) {
+                    await this.todoItems.bulkDelete(idsToDelete);
+                }
 
                 const itemsToSave = serverItems.filter(
                     item => !protectedIds.has(item.id)

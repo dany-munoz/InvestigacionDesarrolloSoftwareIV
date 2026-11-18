@@ -38,16 +38,15 @@ export class TodoItemService {
 
     getAll(): Observable<TodoItem[]> {
         return this.http.get<TodoItem[]>(this.baseUrl).pipe(
-            switchMap(async (serverItems) => {
-                const pendingOps = await this.todoItemDatabase.getAllPending();
-                const pendingIds = new Set(pendingOps.map(op => op.todoId));
-
-                const itemsToSave = serverItems.filter(item => !pendingIds.has(item.id));
-                await this.todoItemDatabase.saveAll(itemsToSave);
-
+            switchMap(async (serverItems) => {    
+                await this.todoItemDatabase.saveRemoteItems(serverItems);
                 return await this.todoItemDatabase.getAll();
             }),
             catchError((error) => {
+                if(!this.isNetworkError(error)) {
+                    return throwError(() => error);
+                }
+
                 console.error('Error connecting to API: loading local data', error);
                 return from(this.todoItemDatabase.getAll());
             })
@@ -65,7 +64,11 @@ export class TodoItemService {
     }
 
     delete(id: number): Observable<void> {
-        return this.http.delete<void>(`${this.baseUrl}/${id}`);
+        return this.http.delete<void>(`${this.baseUrl}/${id}`).pipe(
+            tap(async () => {
+                await this.todoItemDatabase.deleteItem(id);
+            })
+        );
     }
 
     create(todo: NewTodoItem): Observable<TodoItem> {
