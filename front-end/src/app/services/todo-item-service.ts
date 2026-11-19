@@ -55,8 +55,6 @@ export class TodoItemService {
 
     toggleComplete(id: number): Observable<TodoItem> {
         return this.http.patch<TodoItem>(`${this.baseUrl}/${id}/toggle`, {}).pipe(
-            // Guarda la tarea con su nueva versión para que una edición posterior
-            // no se base en una versión vieja.
             tap(async (updatedItem) => {
                 await this.todoItemDatabase.save(updatedItem);
             })
@@ -126,8 +124,6 @@ export class TodoItemService {
     update(id: number, todo: UpdateTodoItem): Observable<TodoItem> {
         return from(this.todoItemDatabase.getById(id)).pipe(
             switchMap((existingItem) => {
-                // La edición se envía con la versión sobre la que se hizo,
-                // para que el servidor detecte si la tarea cambió en otro lugar.
                 const baseVersion = existingItem?.version ?? 0;
 
                 const buildLocalItem = (): TodoItem => ({
@@ -159,8 +155,6 @@ export class TodoItemService {
                                 await this.todoItemDatabase.saveWithPending(localItem, 'UPDATE');
 
                                 if (isConflict) {
-                                    // Conflicto: la edición se conserva como pendiente
-                                    // y se registran ambas versiones para elegir.
                                     console.warn('Conflict detected, saving both versions.', error);
                                     await this.todoItemDatabase.saveConflict(localItem, error.error as TodoItem);
                                 } else {

@@ -28,7 +28,6 @@ export class TodoList implements OnInit {
   pendingCount = this.todoItemService.pendingCount;
 
   todos = signal<TodoItem[]>([]);
-  // IDs de las tareas con un conflicto sin resolver.
   conflictIds = signal<Set<number>>(new Set());
   loading = signal(true);
   errorMessage = signal('');
@@ -108,7 +107,6 @@ export class TodoList implements OnInit {
     });
   }
 
-  // Cierra la sesión y regresa de inmediato a la portada.
   onLogout(): void {
     this.authService.logout();
     void this.router.navigate(['/']);

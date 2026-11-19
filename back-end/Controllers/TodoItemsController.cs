@@ -59,29 +59,12 @@ namespace TodoApi.Controllers
             return Ok(query);
         }
 
-        // [HttpPost]
-        // public async Task<ActionResult<TodoItem>> CreateTodoItem(string title, string description)
-        // {
-        //     var todoToAdd = new TodoItem();
-
-        //     todoToAdd.Title = title;
-        //     todoToAdd.Description = description;
-
-        //     _context.TodoItems.Add(todoToAdd);
-        //     await _context.SaveChangesAsync();
-
-        //     return CreatedAtAction(nameof(GetTodoItem), new { id = todoToAdd.Id }, todoToAdd);
-        // }
-
         [HttpPut("{id:int}")]
         public async Task<ActionResult<TodoItem>> UpdateTodoItem(int id, TodoItem updated)
         {
             var todoItem = await _context.TodoItems.FindAsync(id);
             if (todoItem == null) return NotFound();
 
-            // Detección de conflictos: la edición debe hacerse sobre la versión actual.
-            // Si otro lugar ya modificó la tarea, se responde 409 con la tarea actual
-            // para que el cliente muestre ambas versiones.
             if (updated.Version != todoItem.Version)
             {
                 return Conflict(todoItem);

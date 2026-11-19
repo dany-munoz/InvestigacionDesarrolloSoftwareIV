@@ -1,5 +1,3 @@
-/* Estilos globales: tokens y piezas compartidas (botones, campos, mensajes).
-   Cada componente conserva solo su maquetación. */
 :root {
   --bg: #eef1f5;
   --surface: #ffffff;
@@ -62,16 +60,12 @@ a {
   outline-offset: 2px;
 }
 
-/* La pantalla de inicio de sesión y registro va limpia:
-   sin encabezado y sin barra de sincronización. */
 body:has(app-login) .app-header,
 body:has(app-login) .sync-dock,
 body:has(app-home .status-text:not(.success)) .sync-dock {
-  /* !important: los estilos del componente App tienen más especificidad. */
   display: none !important;
 }
 
-/* En la portada el título grande ya hace de marca. */
 body:has(app-home) .app-header {
   display: none !important;
 }
@@ -81,7 +75,6 @@ body:has(app-login) .app-main {
   max-width: none !important;
 }
 
-/* ---------- Botones ---------- */
 .btn-primary,
 .btn-secondary {
   display: inline-flex;
@@ -130,7 +123,6 @@ body:has(app-login) .app-main {
   background: var(--surface-2);
 }
 
-/* ---------- Formularios ---------- */
 label {
   font-size: 0.9rem;
   font-weight: 600;
@@ -167,7 +159,6 @@ label {
   font-weight: 400;
 }
 
-/* ---------- Mensajes ---------- */
 .field-error {
   margin: 0;
   color: var(--danger);
@@ -199,8 +190,6 @@ label {
   color: #6b4100;
 }
 
-/* ---------- Diálogos (SweetAlert2) ----------
-   Se montan en <body>, por eso viven aquí y no en el componente. */
 .swal2-container.swal2-backdrop-show {
   background: rgba(22, 32, 46, 0.45);
 }

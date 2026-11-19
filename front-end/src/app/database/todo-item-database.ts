@@ -20,7 +20,6 @@ export class TodoItemDatabase extends Dexie {
             pendingOperations: '++id, todoId, type'
         });
 
-        // Versión 3: tabla de conflictos (una entrada por tarea en conflicto).
         this.version(3).stores({
             todoItems: 'id, syncStatus',
             pendingOperations: '++id, todoId, type',
@@ -131,9 +130,6 @@ export class TodoItemDatabase extends Dexie {
         await this.pendingOperations.delete(operationId);
     }
 
-    // Confirma una edición aceptada por el servidor y propaga la nueva versión
-    // a los demás pendientes de la misma tarea, para que no generen un conflicto
-    // falso al enviarse con la versión anterior.
     async confirmUpdatedItem(
         operationId: number,
         serverItem: TodoItem
@@ -172,8 +168,6 @@ export class TodoItemDatabase extends Dexie {
         );
     }
 
-    // ----- Conflictos -----
-
     async saveConflict(localItem: TodoItem, serverItem: TodoItem): Promise<void> {
         await this.conflicts.put({
             todoId: localItem.id,
@@ -195,8 +189,6 @@ export class TodoItemDatabase extends Dexie {
         return await this.conflicts.count();
     }
 
-    // "Conservar mi versión": los pendientes de la tarea pasan a basarse en la
-    // versión actual del servidor y se reenviarán en la siguiente sincronización.
     async keepLocalVersion(todoId: number): Promise<void> {
         await this.transaction(
             'rw',
@@ -227,8 +219,6 @@ export class TodoItemDatabase extends Dexie {
         );
     }
 
-    // "Conservar la versión del servidor": se guarda la versión del servidor y
-    // se descartan los pendientes locales de esa tarea.
     async keepServerVersion(todoId: number): Promise<void> {
         await this.transaction(
             'rw',

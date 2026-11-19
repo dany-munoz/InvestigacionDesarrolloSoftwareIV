@@ -47,7 +47,6 @@
     box-shadow: var(--shadow);
 }
 
-/* La versión local se distingue con el acento de la app. */
 .version-card:first-child {
     border-top: 4px solid var(--accent);
 }
@@ -93,7 +92,6 @@
     overflow-wrap: anywhere;
 }
 
-/* Campos que difieren entre ambas versiones */
 .version-card dd.changed {
     background: var(--warn-soft);
     box-shadow: inset 3px 0 0 var(--warn);

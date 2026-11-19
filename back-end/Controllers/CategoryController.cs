@@ -43,17 +43,6 @@ namespace TodoApi.Controllers
             return CreatedAtAction(nameof(GetCategory), new { id = category.Id }, category);
         }
 
-        // [HttpPost]
-        // public async Task<ActionResult<Category>> CreateCategory(String name)
-        // {
-        //     var category = new Category();
-        //     category.Name= name;
-
-        //     _context.Categories.Add(category);
-        //     await _context.SaveChangesAsync();
-        //     return CreatedAtAction(nameof(GetCategory), new { id = category.Id }, category);
-        // }
-
         [HttpPut("{id:int}")]
         public async Task<ActionResult> UpdateCategory(int id, Category updated)
         {

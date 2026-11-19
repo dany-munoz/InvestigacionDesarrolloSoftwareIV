@@ -5,8 +5,6 @@ import { TodoConflict } from '../../models/todo-conflict.model';
 import { SyncService } from '../../services/sync-service';
 import { TodoItemService } from '../../services/todo-item-service';
 
-// Pantalla de resolución de conflictos: muestra la versión local y la del
-// servidor de una misma tarea y permite elegir cuál conservar.
 @Component({
   selector: 'app-todo-conflict',
   imports: [RouterLink],

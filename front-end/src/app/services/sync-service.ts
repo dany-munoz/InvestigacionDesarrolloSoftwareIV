@@ -122,7 +122,6 @@ export class SyncService {
                     throw new Error('Se encontró una operación sin identificador.');
                 }
 
-                // Una creación anterior puede haber sustituido el ID temporal.
                 const currentOperation =
                     await this.database.pendingOperations.get(snapshot.id);
 
@@ -130,8 +129,6 @@ export class SyncService {
                     continue;
                 }
 
-                // Los pendientes de una tarea en conflicto esperan a que la
-                // persona elija una versión; no bloquean al resto de la cola.
                 if (await this.database.getConflict(currentOperation.todoId)) {
                     continue;
                 }
@@ -217,8 +214,6 @@ export class SyncService {
                         ).pipe(timeout(this.requestTimeout))
                     );
                 } catch (error: unknown) {
-                    // 409: la tarea cambió en el servidor. Se guarda el conflicto
-                    // con ambas versiones y el pendiente se conserva.
                     if (error instanceof HttpErrorResponse && error.status === 409) {
                         this.apiAvailable.set(true);
                         await this.database.saveConflict(

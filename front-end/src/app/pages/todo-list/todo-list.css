@@ -2,7 +2,6 @@
     padding: 0.5rem 0 1rem;
 }
 
-/* ---------- Encabezado ---------- */
 .header-section {
     display: flex;
     flex-wrap: wrap;
@@ -20,7 +19,6 @@
     letter-spacing: -0.035em;
 }
 
-/* ---------- Estados ---------- */
 .state-message {
     padding: 2.5rem 1.25rem;
     border: 1px dashed var(--line-strong);
@@ -51,7 +49,6 @@
     font-weight: 600;
 }
 
-/* ---------- Lista ---------- */
 .todo-list {
     margin: 0;
     padding: 0;
@@ -89,7 +86,6 @@
     cursor: pointer;
 }
 
-/* Casilla redonda propia. */
 .checkbox-input {
     flex: none;
     display: grid;
@@ -131,7 +127,6 @@
     text-decoration-color: var(--line-strong);
 }
 
-/* ---------- Acciones ---------- */
 .todo-actions {
     display: flex;
     flex: none;
@@ -170,7 +165,6 @@
     color: var(--danger);
 }
 
-/* Tarea con un conflicto sin resolver */
 .todo-item.in-conflict {
     border-left-color: var(--warn);
     background: var(--warn-soft);
@@ -187,7 +181,6 @@
     color: #fff;
 }
 
-/* ---------- Pie ---------- */
 .footer-section {
     display: flex;
     justify-content: flex-start;

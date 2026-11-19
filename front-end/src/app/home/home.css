@@ -1,5 +1,3 @@
-/* Portada: un solo panel centrado con el mismo fondo y tono
-   que la lista de tareas (superficie blanca, borde suave y sombra). */
 .home-wrapper {
     display: grid;
     place-items: center;
@@ -18,7 +16,6 @@
     text-align: center;
 }
 
-/* Marca: el mismo cuadro con palomita del encabezado, en grande. */
 .brand-mark {
     display: block;
     width: 3.5rem;
